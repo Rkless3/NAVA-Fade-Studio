@@ -409,7 +409,7 @@ session_start();
             </h3>
 
             <p>
-                Your current address here
+                Jugno, Amlan Negros Oriental
             </p>
 
             <p>
