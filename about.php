@@ -1,0 +1,469 @@
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>About Us | NAVA Fade Studio</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+<!-- =========================
+     HEADER / NAVBAR
+========================= -->
+
+<header class="header">
+    <div class="container navbar">
+
+        <a href="index.php" class="logo">
+            <img src="assets/images/logo.png" alt="NAVA Fade Studio">
+        </a>
+
+        <nav>
+
+            <a href="index.php">Home</a>
+
+            <a href="about.php" class="active">About Us</a>
+
+            <a href="index.php#services">Service</a>
+
+            <a href="shop.php">Shop</a>
+
+            <a href="blog.php">Blog</a>
+
+            <a href="book.php">Book Now</a>
+
+            <?php if (isset($_SESSION["customer_id"])): ?>
+
+                <div class="customer-menu">
+
+                    <button
+                        type="button"
+                        class="customer-menu-btn"
+                        onclick="toggleCustomerMenu()"
+                    >
+                        👤
+                        <?php echo htmlspecialchars($_SESSION["customer_name"]); ?>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+
+                    <div
+                        class="customer-dropdown"
+                        id="customerDropdown"
+                    >
+
+                        <a href="profile.php">
+                            👤 My Profile
+                        </a>
+
+                        <a href="appointments.php">
+                            📅 My Appointments
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="logout.php" class="logout-link">
+                            🚪 Logout
+                        </a>
+
+                    </div>
+
+                </div>
+
+            <?php else: ?>
+
+                <a href="register.php" class="nav-button">
+                    Register
+                </a>
+
+            <?php endif; ?>
+
+        </nav>
+
+    </div>
+</header>
+
+
+<!-- =========================
+     ABOUT HERO
+========================= -->
+
+<section class="about-hero">
+
+    <div class="about-hero-content">
+
+        <span>ABOUT NAVA FADE STUDIO</span>
+
+        <h1>
+            MORE THAN JUST
+            <strong>A HAIRCUT</strong>
+        </h1>
+
+        <div class="about-gold-line"></div>
+
+        <p>
+            A modern barbershop experience built around
+            quality grooming, personal style, and customer satisfaction.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     WHO WE ARE
+========================= -->
+
+<section class="about-story">
+
+    <div class="about-story-image">
+
+        <img
+            src="assets/images/beard-trimming.png"
+            alt="NAVA Fade Studio grooming service"
+        >
+
+    </div>
+
+
+    <div class="about-story-content">
+
+        <span class="about-small-title">
+            WHO WE ARE
+        </span>
+
+        <h2>
+            WE ARE <span>NAVA FADE STUDIO</span>
+        </h2>
+
+        <p>
+            NAVA Fade Studio is a modern barbershop created
+            for customers who want quality grooming and a
+            comfortable experience in one place.
+        </p>
+
+        <p>
+            From classic haircuts and beard grooming to
+            hair treatments and styling, we provide services
+            designed to help every customer look and feel
+            confident.
+        </p>
+
+        <p>
+            We believe that a great haircut is more than
+            changing your appearance. It is about giving
+            customers a fresh look and an experience worth
+            coming back for.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     OUR MISSION
+========================= -->
+
+<section class="about-mission">
+
+    <div class="about-mission-content">
+
+        <span class="about-small-title">
+            OUR MISSION
+        </span>
+
+        <h2>
+            QUALITY GROOMING.
+            <span>BETTER EXPERIENCE.</span>
+        </h2>
+
+        <p>
+            Our mission is to provide reliable and quality
+            grooming services while creating a welcoming
+            environment for every customer.
+        </p>
+
+        <p>
+            NAVA Fade Studio aims to combine skilled
+            barbers, quality services, and convenient
+            appointment booking to make every visit simple
+            and enjoyable.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     WHY CHOOSE NAVA
+========================= -->
+
+<section class="why-nava">
+
+    <div class="about-section-heading">
+
+        <span class="about-small-title">
+            WHY CHOOSE US
+        </span>
+
+        <h2>
+            WHY <span>NAVA?</span>
+        </h2>
+
+        <p>
+            We focus on the things that make a barbershop
+            experience better.
+        </p>
+
+    </div>
+
+
+    <div class="why-nava-grid">
+
+        <div class="why-card">
+
+            <div class="why-icon">
+                ✂
+            </div>
+
+            <h3>
+                QUALITY SERVICES
+            </h3>
+
+            <p>
+                Professional grooming services designed
+                around different customer needs and styles.
+            </p>
+
+        </div>
+
+
+        <div class="why-card">
+
+            <div class="why-icon">
+                ★
+            </div>
+
+            <h3>
+                CUSTOMER FOCUSED
+            </h3>
+
+            <p>
+                We value customer satisfaction and aim to
+                make every visit comfortable and enjoyable.
+            </p>
+
+        </div>
+
+
+        <div class="why-card">
+
+            <div class="why-icon">
+                ✓
+            </div>
+
+            <h3>
+                CONVENIENT BOOKING
+            </h3>
+
+            <p>
+                Customers can easily choose their services
+                and schedule an appointment online.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     BOOKING CTA
+========================= -->
+
+<section class="about-cta">
+
+    <div class="about-cta-content">
+
+        <span>
+            LOOKING FOR YOUR NEXT STYLE?
+        </span>
+
+        <h2>
+            LET'S MAKE YOU
+            <strong>LOOK YOUR BEST.</strong>
+        </h2>
+
+        <p>
+            Choose your service and book your appointment
+            with NAVA Fade Studio today.
+        </p>
+
+        <a href="book.php" class="about-cta-button">
+            BOOK YOUR APPOINTMENT
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer class="footer">
+
+    <div class="footer-content">
+
+        <!-- BRAND -->
+
+        <div>
+
+            <img
+                src="assets/images/logo.png"
+                alt="NAVA Fade Studio"
+                class="footer-logo"
+            >
+
+            <p>
+                NAVA Fade Studio provides quality grooming
+                services designed to give every customer a
+                fresh and confident look.
+            </p>
+
+        </div>
+
+
+        <!-- ABOUT -->
+
+        <div>
+
+            <h3>
+                About Us
+            </h3>
+
+            <a href="about.php">
+                Who We Are
+            </a>
+
+            <a href="index.php#services">
+                Our Services
+            </a>
+
+            <a href="shop.php">
+                Shop
+            </a>
+
+            <a href="blog.php">
+                Blog
+            </a>
+
+        </div>
+
+
+        <!-- SUPPORT -->
+
+        <div>
+
+            <h3>
+                Support
+            </h3>
+
+            <a href="about.php">
+                About Us
+            </a>
+
+            <a href="index.php#services">
+                Services
+            </a>
+
+            <a href="book.php">
+                Book Appointment
+            </a>
+
+            <a href="#">
+                Contact Us
+            </a>
+
+        </div>
+
+
+        <!-- CONTACT -->
+
+        <div>
+
+            <h3>
+                Contact Us
+            </h3>
+
+            <p>
+                Your current address here
+            </p>
+
+            <p>
+                navafadestudio@gmail.com
+            </p>
+
+            <p>
+                0969 407 4629
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================
+     CUSTOMER DROPDOWN JS
+========================= -->
+
+<script>
+
+function toggleCustomerMenu() {
+
+    const dropdown =
+        document.getElementById("customerDropdown");
+
+    dropdown.classList.toggle("show");
+
+}
+
+
+document.addEventListener("click", function(event) {
+
+    const menu =
+        document.querySelector(".customer-menu");
+
+    const dropdown =
+        document.getElementById("customerDropdown");
+
+    if (
+        menu &&
+        dropdown &&
+        !menu.contains(event.target)
+    ) {
+
+        dropdown.classList.remove("show");
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

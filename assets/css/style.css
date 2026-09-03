@@ -3136,3 +3136,545 @@ img {
     }
 
 }
+
+/* =========================================================
+   ABOUT US PAGE
+========================================================= */
+
+
+/* =========================
+   ABOUT HERO
+========================= */
+
+.about-hero {
+    width: 100%;
+    min-height: 520px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 100px 30px;
+
+    background:
+        url("../images/pattern.png");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-hero-content {
+    width: 100%;
+    max-width: 900px;
+}
+
+.about-hero-content > span {
+    color: var(--gold);
+
+    font-size: 15px;
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.about-hero h1 {
+    margin: 25px 0;
+
+    color: var(--white);
+
+    font-size: clamp(45px, 6vw, 80px);
+
+    line-height: 1.05;
+
+    font-weight: 800;
+}
+
+.about-hero h1 strong {
+    display: block;
+
+    color: var(--light-gold);
+}
+
+.about-gold-line {
+    width: 180px;
+    height: 4px;
+
+    background: var(--gold);
+
+    margin: 30px auto;
+}
+
+.about-hero p {
+    max-width: 700px;
+
+    margin: auto;
+
+    color: #eeeeee;
+
+    font-size: 18px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   WHO WE ARE
+========================= */
+
+.about-story {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 80px;
+
+    align-items: center;
+
+    padding: 110px 7%;
+
+    background:
+        url("../images/pattern1.png");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-story-image img {
+    width: 100%;
+
+    height: 500px;
+
+    object-fit: cover;
+
+    border-radius: 25px;
+
+    border: 6px solid var(--gold);
+}
+
+.about-story-content {
+    max-width: 700px;
+}
+
+.about-small-title {
+    color: var(--gold);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    letter-spacing: 3px;
+}
+
+.about-story-content h2 {
+    margin: 18px 0 30px;
+
+    color: #000000;
+
+    font-size: clamp(40px, 4vw, 65px);
+
+    line-height: 1.05;
+
+    font-weight: 800;
+}
+
+.about-story-content h2 span {
+    color: var(--gold);
+}
+
+.about-story-content p {
+    margin-bottom: 22px;
+
+    color: #333333;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   OUR MISSION
+========================= */
+
+.about-mission {
+    width: 100%;
+
+    min-height: 500px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 100px 30px;
+
+    background:
+        url("../images/pattern2.png");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-mission-content {
+    max-width: 850px;
+}
+
+.about-mission .about-small-title {
+    color: var(--light-gold);
+}
+
+.about-mission h2 {
+    margin: 20px 0 25px;
+
+    color: var(--white);
+
+    font-size: clamp(40px, 5vw, 65px);
+
+    line-height: 1.05;
+
+    font-weight: 800;
+}
+
+.about-mission h2 span {
+    display: block;
+
+    color: var(--light-gold);
+}
+
+.about-mission p {
+    margin: 15px auto;
+
+    max-width: 750px;
+
+    color: #eeeeee;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   WHY NAVA
+========================= */
+
+.why-nava {
+    width: 100%;
+
+    padding: 110px 7%;
+
+    background:
+        url("../images/pattern1.png");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-section-heading {
+    max-width: 800px;
+
+    margin: 0 auto 65px;
+
+    text-align: center;
+}
+
+.about-section-heading h2 {
+    margin: 15px 0;
+
+    color: #000000;
+
+    font-size: clamp(40px, 5vw, 60px);
+
+    font-weight: 800;
+}
+
+.about-section-heading h2 span {
+    color: var(--gold);
+}
+
+.about-section-heading p {
+    color: #555555;
+
+    font-size: 17px;
+
+    line-height: 1.6;
+}
+
+.why-nava-grid {
+    width: 100%;
+
+    max-width: 1500px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 30px;
+}
+
+.why-card {
+    padding: 40px 30px;
+
+    text-align: center;
+
+    background: var(--navy);
+
+    border: 5px solid var(--gold);
+
+    border-radius: 20px;
+
+    transition: 0.3s ease;
+}
+
+.why-card:hover {
+    transform: translateY(-8px);
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.why-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--gold);
+
+    color: var(--navy);
+
+    font-size: 30px;
+
+    font-weight: bold;
+}
+
+.why-card h3 {
+    margin-bottom: 15px;
+
+    color: var(--white);
+
+    font-size: 20px;
+}
+
+.why-card p {
+    color: #cccccc;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   ABOUT CTA
+========================= */
+
+.about-cta {
+    width: 100%;
+
+    min-height: 500px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 100px 30px;
+
+    background:
+        url("../images/pattern.png");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-cta-content {
+    max-width: 850px;
+}
+
+.about-cta-content > span {
+    color: var(--gold);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    letter-spacing: 3px;
+}
+
+.about-cta h2 {
+    margin: 20px 0;
+
+    color: var(--white);
+
+    font-size: clamp(40px, 5vw, 65px);
+
+    line-height: 1.05;
+
+    font-weight: 800;
+}
+
+.about-cta h2 strong {
+    display: block;
+
+    color: var(--light-gold);
+}
+
+.about-cta p {
+    max-width: 700px;
+
+    margin: 0 auto 30px;
+
+    color: #eeeeee;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+}
+
+.about-cta-button {
+    display: inline-block;
+
+    padding: 15px 30px;
+
+    background: var(--gold);
+
+    color: var(--black);
+
+    border-radius: 7px;
+
+    font-weight: 700;
+
+    transition: 0.3s ease;
+}
+
+.about-cta-button:hover {
+    background: var(--light-gold);
+
+    transform: translateY(-3px);
+}
+
+
+/* =========================================================
+   ABOUT RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .about-story {
+        grid-template-columns: 1fr;
+
+        gap: 50px;
+
+        padding: 80px 30px;
+    }
+
+    .about-story-image {
+        max-width: 800px;
+
+        margin: auto;
+    }
+
+    .about-story-content {
+        max-width: 800px;
+
+        margin: auto;
+
+        text-align: center;
+    }
+
+    .why-nava {
+        padding: 80px 30px;
+    }
+
+    .why-nava-grid {
+        grid-template-columns: 1fr;
+
+        max-width: 600px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .about-hero {
+        min-height: 450px;
+
+        padding: 80px 20px;
+    }
+
+    .about-hero-content > span {
+        font-size: 12px;
+
+        letter-spacing: 2px;
+    }
+
+    .about-hero p {
+        font-size: 15px;
+    }
+
+
+    .about-story {
+        padding: 70px 20px;
+    }
+
+    .about-story-image img {
+        height: 350px;
+
+        border-width: 4px;
+
+        border-radius: 18px;
+    }
+
+    .about-story-content p {
+        font-size: 15px;
+    }
+
+
+    .about-mission {
+        padding: 80px 20px;
+    }
+
+    .about-mission p {
+        font-size: 15px;
+    }
+
+
+    .why-nava {
+        padding: 70px 20px;
+    }
+
+    .why-card {
+        padding: 30px 20px;
+    }
+
+
+    .about-cta {
+        min-height: 450px;
+
+        padding: 70px 20px;
+    }
+
+    .about-cta p {
+        font-size: 15px;
+    }
+
+}
