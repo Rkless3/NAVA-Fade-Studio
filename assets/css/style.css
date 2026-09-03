@@ -2858,9 +2858,18 @@ img {
 }
 
 
-.shop-hero-content span,
-.shop-page-header span {
+.shop-hero-content span {
     color: var(--navy);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    letter-spacing: 4px;
+}
+
+.shop-page-header span {
+    color: var(--light-gold);
 
     font-size: 14px;
 

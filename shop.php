@@ -2,6 +2,15 @@
 
 session_start();
 
+require_once "config/Database.php";
+require_once "classes/Product.php";
+
+$database = new Database();
+$db = $database->connect();
+
+$productModel = new Product($db);
+$products = $productModel->getActive();
+
 ?>
 
 <!DOCTYPE html>
@@ -180,10 +189,6 @@ session_start();
             OUR PRODUCTS
         </h2>
 
-        <p>
-            Explore our collection of quality
-            hair and grooming essentials.
-        </p>
 
     </div>
 
@@ -191,136 +196,75 @@ session_start();
     <div class="shop-grid">
 
 
-        <!-- PRODUCT 1 -->
+        <div class="shop-grid">
 
-        <div class="shop-product-card1">
+            <?php if (!empty($products)): ?>
 
-                <img
-                    src="assets/images/hair-clay.png"
-                    alt="NAVA Hair Wax"
-                >
+                <?php foreach ($products as $item): ?>
 
-            <div class="product-info">
+                    <div class="shop-product-card1">
 
-                <h3>
-                    NAVA Hair Wax
-                </h3>
+                        <img
+                            src="assets/images/<?= htmlspecialchars($item["image"]) ?>"
+                            alt="<?= htmlspecialchars($item["product_name"]) ?>"
+                        >
 
-                <div class="product-rating">
-                    ★★★★★
-                </div>
+                        <div class="product-info">
 
-                <p>
-                    Strong hold styling wax for
-                    a clean and long-lasting look.
-                </p>
+                            <h3>
+                                <?= htmlspecialchars($item["product_name"]) ?>
+                            </h3>
 
-                <div class="shop-product-bottom">
+                            <div class="product-rating">
+                                ★★★★★
+                            </div>
 
-                    <span class="shop-price">
-                        ₱250
-                    </span>
+                            <p>
+                                <?= htmlspecialchars($item["description"]) ?>
+                            </p>
 
-                    <button
-                        class="shop-add-btn"
-                        type="button"
-                    >
-                        ADD TO CART
-                    </button>
+                            <div class="shop-product-bottom">
 
-                </div>
+                                <span class="shop-price">
+                                    ₱<?= number_format($item["price"], 2) ?>
+                                </span>
 
-            </div>
+                                <?php if ($item["stock"] > 0): ?>
 
-        </div>
+                                    <button
+                                        class="shop-add-btn"
+                                        type="button"
+                                    >
+                                        ADD TO CART
+                                    </button>
 
+                                <?php else: ?>
 
+                                    <button
+                                        class="shop-add-btn"
+                                        type="button"
+                                        disabled
+                                    >
+                                        OUT OF STOCK
+                                    </button>
 
-        <!-- PRODUCT 2 -->
+                                <?php endif; ?>
 
-        <div class="shop-product-card1">
+                            </div>
 
-                <img
-                    src="assets/images/shampoo.png"
-                    alt="NAVA Shampoo"
-                >
+                        </div>
 
-            <div class="product-info">
+                    </div>
 
-                <h3>
-                    NAVA Shampoo
-                </h3>
+                <?php endforeach; ?>
 
-                <div class="product-rating">
-                    ★★★★★
-                </div>
-
-                <p>
-                    Refresh and cleanse your hair
-                    for a healthy and clean finish.
-                </p>
-
-                <div class="shop-product-bottom">
-
-                    <span class="shop-price">
-                        ₱180
-                    </span>
-
-                    <button
-                        class="shop-add-btn"
-                        type="button"
-                    >
-                        ADD TO CART
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- PRODUCT 3 -->
-
-        <div class="shop-product-card1">
-
-                <img
-                    src="assets/images/hair-spray.png"
-                    alt="NAVA Hair Treatment"
-                >
-
-            <div class="product-info">
-
-                <h3>
-                    NAVA Hair Spray
-                </h3>
-
-                <div class="product-rating">
-                    ★★★★★
-                </div>
+            <?php else: ?>
 
                 <p>
-                    Nourish and protect your hair
-                    with premium hair care.
+                    No products available at the moment.
                 </p>
 
-                <div class="shop-product-bottom">
-
-                    <span class="shop-price">
-                        ₱300
-                    </span>
-
-                    <button
-                        class="shop-add-btn"
-                        type="button"
-                    >
-                        ADD TO CART
-                    </button>
-
-                </div>
-
-            </div>
+            <?php endif; ?>
 
         </div>
 
