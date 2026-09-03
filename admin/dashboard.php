@@ -549,6 +549,12 @@ try {
         </a>
 
 
+        <a
+            href="products.php">
+            Products
+        </a>
+        
+
         <a href="#">
             Reviews
         </a>
