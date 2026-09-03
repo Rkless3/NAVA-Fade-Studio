@@ -497,10 +497,11 @@ $products = $product->getAll();
             padding: 15px 20px;
 
             margin-bottom: 25px;
+            background: rgba(46, 204, 113, 0.12);
 
-            background: var(--success-color, #6fcf97);
+            color: #2ecc71;
 
-            color: var(--success-text-color, #0e1423);
+            border: 1px solid #2ecc71;
 
             border-radius: 8px;
 
@@ -1064,6 +1065,11 @@ $products = $product->getAll();
             class="active"
         >
             Products
+        </a>
+
+
+        <a href="orders.php">
+            Orders
         </a>
 
 

@@ -666,7 +666,12 @@ try {
             href="products.php">
             Products
         </a>
-        
+
+
+        <a href="orders.php">
+            Orders
+        </a>
+
 
         <a href="#">
             Reviews

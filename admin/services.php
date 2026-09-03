@@ -717,10 +717,15 @@ $services = $service->getAll();
         <a href="bookings.php">
             Bookings
         </a>
-        
+
 
         <a href="products.php">
             Products
+        </a>
+
+
+        <a href="orders.php">
+            Orders
         </a>
 
 

@@ -9,6 +9,64 @@ $database = new Database();
 $db = $database->connect();
 
 $productModel = new Product($db);
+
+
+/* =========================================
+   ADD TO CART
+========================================= */
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["add_to_cart"])) {
+
+    /* LOGIN REQUIRED */
+
+    if (!isset($_SESSION["customer_id"])) {
+        header("Location: login.php");
+        exit;
+    }
+
+    $product_id = (int) $_POST["product_id"];
+
+    $product = $productModel->getById($product_id);
+
+    if ($product && $product["status"] === "Active" && $product["stock"] > 0) {
+
+        if (!isset($_SESSION["cart"])) {
+            $_SESSION["cart"] = [];
+        }
+
+        /*
+         * If product already exists in cart,
+         * increase its quantity.
+         */
+        if (isset($_SESSION["cart"][$product_id])) {
+
+            if ($_SESSION["cart"][$product_id] < $product["stock"]) {
+                $_SESSION["cart"][$product_id]++;
+            }
+
+        } else {
+
+            /*
+             * First time adding this product.
+             */
+            $_SESSION["cart"][$product_id] = 1;
+        }
+
+        /*
+         * Go directly to cart after adding.
+         */
+        header("Location: cart.php");
+        exit;
+    }
+
+    /*
+     * Product is unavailable.
+     */
+    header("Location: shop.php");
+    exit;
+}
+
+
 $products = $productModel->getActive();
 
 ?>
@@ -83,6 +141,7 @@ $products = $productModel->getActive();
                 Book Now
             </a>
 
+
             <?php if (isset($_SESSION["customer_id"])): ?>
 
                 <div class="customer-menu">
@@ -95,7 +154,9 @@ $products = $productModel->getActive();
 
                         👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
 
-                        <span class="dropdown-arrow">▼</span>
+                        <span class="dropdown-arrow">
+                            ▼
+                        </span>
 
                     </button>
 
@@ -113,7 +174,7 @@ $products = $productModel->getActive();
                             📅 My Appointments
                         </a>
 
-                    <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div>
 
                         <a
                             href="logout.php"
@@ -189,85 +250,98 @@ $products = $productModel->getActive();
             OUR PRODUCTS
         </h2>
 
-
     </div>
 
 
     <div class="shop-grid">
 
+        <?php if (!empty($products)): ?>
 
-        <div class="shop-grid">
+            <?php foreach ($products as $item): ?>
 
-            <?php if (!empty($products)): ?>
+                <div class="shop-product-card1">
 
-                <?php foreach ($products as $item): ?>
+                    <img
+                        src="assets/images/<?= htmlspecialchars($item["image"]) ?>"
+                        alt="<?= htmlspecialchars($item["product_name"]) ?>"
+                    >
 
-                    <div class="shop-product-card1">
 
-                        <img
-                            src="assets/images/<?= htmlspecialchars($item["image"]) ?>"
-                            alt="<?= htmlspecialchars($item["product_name"]) ?>"
-                        >
+                    <div class="product-info">
 
-                        <div class="product-info">
+                        <h3>
+                            <?= htmlspecialchars($item["product_name"]) ?>
+                        </h3>
 
-                            <h3>
-                                <?= htmlspecialchars($item["product_name"]) ?>
-                            </h3>
 
-                            <div class="product-rating">
-                                ★★★★★
-                            </div>
+                        <div class="product-rating">
+                            ★★★★★
+                        </div>
 
-                            <p>
-                                <?= htmlspecialchars($item["description"]) ?>
-                            </p>
 
-                            <div class="shop-product-bottom">
+                        <p>
+                            <?= htmlspecialchars($item["description"]) ?>
+                        </p>
 
-                                <span class="shop-price">
-                                    ₱<?= number_format($item["price"], 2) ?>
-                                </span>
 
-                                <?php if ($item["stock"] > 0): ?>
+                        <div class="shop-product-bottom">
+
+                            <span class="shop-price">
+                                ₱<?= number_format($item["price"], 2) ?>
+                            </span>
+
+
+                            <?php if ($item["stock"] > 0): ?>
+
+                                <form
+                                    method="POST"
+                                    action="shop.php"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="product_id"
+                                        value="<?= (int) $item["id"] ?>"
+                                    >
+
 
                                     <button
                                         class="shop-add-btn"
-                                        type="button"
+                                        type="submit"
+                                        name="add_to_cart"
                                     >
                                         ADD TO CART
                                     </button>
 
-                                <?php else: ?>
+                                </form>
 
-                                    <button
-                                        class="shop-add-btn"
-                                        type="button"
-                                        disabled
-                                    >
-                                        OUT OF STOCK
-                                    </button>
+                            <?php else: ?>
 
-                                <?php endif; ?>
+                                <button
+                                    class="shop-add-btn"
+                                    type="button"
+                                    disabled
+                                >
+                                    OUT OF STOCK
+                                </button>
 
-                            </div>
+                            <?php endif; ?>
 
                         </div>
 
                     </div>
 
-                <?php endforeach; ?>
+                </div>
 
-            <?php else: ?>
+            <?php endforeach; ?>
 
-                <p>
-                    No products available at the moment.
-                </p>
+        <?php else: ?>
 
-            <?php endif; ?>
+            <p>
+                No products available at the moment.
+            </p>
 
-        </div>
-
+        <?php endif; ?>
 
     </div>
 

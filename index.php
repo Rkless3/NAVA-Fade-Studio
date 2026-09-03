@@ -103,8 +103,8 @@ $services = $serviceObject->getAll();
                         id="customerDropdown"
                     >
 
-                        <a href="profile.php">
-                            👤 My Profile
+                        <a href="my-orders.php">
+                            🛍️ My Orders
                         </a>
 
                         <a href="appointments.php">

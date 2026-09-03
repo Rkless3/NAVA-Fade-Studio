@@ -555,6 +555,11 @@ try {
         </a>
         
 
+        <a href="orders.php">
+            Orders
+        </a>
+
+
         <a href="#">
             Reviews
         </a>
