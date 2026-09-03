@@ -2846,7 +2846,7 @@ img {
 
     padding: 120px 20px 80px;
 
-    background: #0e1423;
+    background: url("../images/pattern.png");
 
     background-size: cover;
     background-position: center;
@@ -2860,7 +2860,7 @@ img {
 
 .shop-hero-content span,
 .shop-page-header span {
-    color: #b8862c;
+    color: var(--navy);
 
     font-size: 14px;
 
@@ -2873,7 +2873,7 @@ img {
 .shop-hero h1 {
     margin: 15px 0;
 
-    color: #ffffff;
+    color: var(--light-gold);
 
     font-size: clamp(42px, 6vw, 70px);
 }
@@ -2884,7 +2884,7 @@ img {
 
     margin: auto;
 
-    color: #bfc3cc;
+    color: var(--navy);
 
     font-size: 17px;
 
@@ -3182,7 +3182,7 @@ img {
 .about-hero h1 {
     margin: 25px 0;
 
-    color: var(--white);
+    color: var(--navy);
 
     font-size: clamp(45px, 6vw, 80px);
 
@@ -3211,7 +3211,7 @@ img {
 
     margin: auto;
 
-    color: #eeeeee;
+    color: #0e1423;
 
     font-size: 18px;
 
@@ -3272,7 +3272,7 @@ img {
 .about-story-content h2 {
     margin: 18px 0 30px;
 
-    color: #000000;
+    color: #0e1423;
 
     font-size: clamp(40px, 4vw, 65px);
 
@@ -3288,7 +3288,7 @@ img {
 .about-story-content p {
     margin-bottom: 22px;
 
-    color: #333333;
+    color: #0e1423;
 
     font-size: 17px;
 
@@ -3387,7 +3387,7 @@ img {
 .about-section-heading h2 {
     margin: 15px 0;
 
-    color: #000000;
+    color: #0e1423;
 
     font-size: clamp(40px, 5vw, 60px);
 
@@ -3522,7 +3522,7 @@ img {
 .about-cta h2 {
     margin: 20px 0;
 
-    color: var(--white);
+    color: var(--navy);
 
     font-size: clamp(40px, 5vw, 65px);
 
@@ -3542,7 +3542,7 @@ img {
 
     margin: 0 auto 30px;
 
-    color: #eeeeee;
+    color: #0e1423;
 
     font-size: 17px;
 
