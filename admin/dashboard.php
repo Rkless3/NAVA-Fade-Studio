@@ -500,7 +500,13 @@ try {
     <div class="admin-user">
 
         <span>
-            Welcome, <?= htmlspecialchars($adminUsername) ?>
+
+            Welcome,
+            <?= htmlspecialchars(
+                $_SESSION["admin_username"]
+                ?? "Admin"
+            ) ?>
+
         </span>
 
         <a

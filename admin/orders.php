@@ -118,25 +118,40 @@ foreach ($orders as $order) {
         ========================= */
 
         .admin-header {
-            height: 88px;
-            background: #0e1423;
-            border-bottom: 2px solid #b8862c;
+            width: 100%;
+
+            height: 80px;
 
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            padding: 0 45px;
+            padding: 0 50px;
+
+            background: #0e1423;
+
+            border-bottom: 2px solid #b8862c;
 
             position: sticky;
             top: 0;
+
             z-index: 1000;
         }
 
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
         .admin-logo img {
-            width: 170px;
-            height: auto;
-            display: block;
+            width: 165px;
+            height: 165px;
+
+            object-fit: contain;
         }
 
         .admin-user {
@@ -164,74 +179,80 @@ foreach ($orders as $order) {
         }
 
 
-        /* =========================
-           MAIN LAYOUT
-        ========================= */
+        /* =========================================
+           DASHBOARD LAYOUT
+           ========================================= */
 
-        .admin-layout {
+        .dashboard {
             display: flex;
-            min-height: calc(100vh - 88px);
+
+            min-height: calc(100vh - 80px);
         }
 
 
-        /* =========================
+        /* =========================================
            SIDEBAR
-        ========================= */
+           ========================================= */
 
         .sidebar {
-            width: 288px;
-            flex-shrink: 0;
+            width: 250px;
+
+            padding: 35px 20px;
 
             background: rgba(14, 20, 35, 0.95);
 
-            padding: 40px 18px;
-            border-right: 1px solid rgba(184, 134, 44, 0.15);
+            border-right: 1px solid rgba(184, 134, 44, 0.5);
         }
+
 
         .sidebar-title {
-            color: #9fa7b8;
-            font-size: 14px;
-            letter-spacing: 3px;
+            margin-bottom: 25px;
 
-            margin: 5px 18px 28px;
+            padding-left: 15px;
+
+            color: #888;
+
+            font-size: 13px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 2px;
         }
+
 
         .sidebar a {
             display: block;
 
-            color: white;
+            padding: 15px 18px;
+
+            margin-bottom: 8px;
+
+            border-radius: 10px;
+
+            color: #ffffff;
+
             text-decoration: none;
 
-            padding: 17px 21px;
-            margin-bottom: 7px;
-
-            border-radius: 11px;
-
-            font-size: 17px;
-            font-weight: bold;
-
-            transition: 0.3s;
+            transition: 0.3s ease;
         }
 
-        .sidebar a:hover {
-            background: rgba(184, 134, 44, 0.15);
-            color: #d19a2a;
-        }
 
+        .sidebar a:hover,
         .sidebar a.active {
-            background: #c18b28;
+            background: #b8862c;
+
             color: #0e1423;
         }
 
 
-        /* =========================
-           CONTENT
-        ========================= */
+        /* =========================================
+           MAIN CONTENT
+           ========================================= */
 
         .main-content {
             flex: 1;
-            padding: 55px;
-            min-width: 0;
+
+            padding: 50px;
         }
 
         .page-header {
@@ -588,7 +609,7 @@ foreach ($orders as $order) {
      ADMIN LAYOUT
 ================================ -->
 
-<div class="admin-layout">
+<div class="dashboard">
 
 
     <!-- SIDEBAR -->

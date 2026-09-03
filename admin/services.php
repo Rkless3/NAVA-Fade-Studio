@@ -149,49 +149,40 @@ $services = $service->getAll();
            ========================================= */
 
         .admin-header {
+            width: 100%;
 
             height: 80px;
 
-            padding: 0 50px;
-
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
+
+            padding: 0 50px;
 
             background: #0e1423;
 
             border-bottom: 2px solid #b8862c;
 
             position: sticky;
-
             top: 0;
 
             z-index: 1000;
-
         }
 
 
         .admin-logo {
-
             display: flex;
-
             align-items: center;
 
             gap: 15px;
-
         }
 
 
         .admin-logo img {
-
             width: 165px;
-
             height: 165px;
 
             object-fit: contain;
-
         }
 
 
@@ -663,12 +654,14 @@ $services = $service->getAll();
 
 
     <div class="admin-user">
+<span>
 
-        <span>
             Welcome,
             <?= htmlspecialchars(
-                $_SESSION["admin_username"] ?? "Admin"
+                $_SESSION["admin_username"]
+                ?? "Admin"
             ) ?>
+
         </span>
 
         <a
@@ -729,7 +722,7 @@ $services = $service->getAll();
         </a>
 
 
-        <a href="#">
+        <a href="reviews.php">
             Reviews
         </a>
 
