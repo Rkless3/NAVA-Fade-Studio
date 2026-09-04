@@ -1073,7 +1073,7 @@ $products = $product->getAll();
         </a>
 
 
-        <a href="#">
+        <a href="reviews.php">
             Reviews
         </a>
 
@@ -1107,14 +1107,6 @@ $products = $product->getAll();
                 </p>
 
             </div>
-
-
-            <a
-                href="#add-product"
-                class="add-btn"
-            >
-                + Add Product
-            </a>
 
         </div>
 

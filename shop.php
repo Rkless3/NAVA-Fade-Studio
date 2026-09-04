@@ -154,9 +154,7 @@ $products = $productModel->getActive();
 
                         👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
 
-                        <span class="dropdown-arrow">
-                            ▼
-                        </span>
+                        <span class="dropdown-arrow">▼</span>
 
                     </button>
 
@@ -166,15 +164,19 @@ $products = $productModel->getActive();
                         id="customerDropdown"
                     >
 
-                        <a href="profile.php">
-                            👤 My Profile
+                        <a href="my-orders.php">
+                            🛍️ My Orders
                         </a>
 
                         <a href="appointments.php">
                             📅 My Appointments
                         </a>
 
-                        <div class="dropdown-divider"></div>
+                        <a href="review.php">
+                            ⭐ Write a Review
+                        </a>
+
+                    <div class="dropdown-divider"></div>
 
                         <a
                             href="logout.php"

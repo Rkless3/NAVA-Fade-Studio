@@ -38,38 +38,50 @@ session_start();
 
             <a href="blog.php">Blog</a>
 
-            <a href="book.php">Book Now</a>
+            <a href="book.php" class="nav-button">
+                Book Now
+            </a>
 
             <?php if (isset($_SESSION["customer_id"])): ?>
 
                 <div class="customer-menu">
 
                     <button
-                        type="button"
                         class="customer-menu-btn"
+                        type="button"
                         onclick="toggleCustomerMenu()"
                     >
-                        👤
-                        <?php echo htmlspecialchars($_SESSION["customer_name"]); ?>
+
+                        👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
+
                         <span class="dropdown-arrow">▼</span>
+
                     </button>
+
 
                     <div
                         class="customer-dropdown"
                         id="customerDropdown"
                     >
 
-                        <a href="profile.php">
-                            👤 My Profile
+                        <a href="my-orders.php">
+                            🛍️ My Orders
                         </a>
 
                         <a href="appointments.php">
                             📅 My Appointments
                         </a>
 
-                        <div class="dropdown-divider"></div>
+                        <a href="review.php">
+                            ⭐ Write a Review
+                        </a>
 
-                        <a href="logout.php" class="logout-link">
+                    <div class="dropdown-divider"></div>
+
+                        <a
+                            href="logout.php"
+                            class="logout-link"
+                        >
                             🚪 Logout
                         </a>
 

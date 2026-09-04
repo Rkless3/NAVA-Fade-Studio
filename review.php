@@ -29,11 +29,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Please write a comment.";
     } else {
 
-        $review->customer_id = $_SESSION["customer_id"];
-        $review->rating = $rating;
-        $review->comment = $comment;
+       if ($review->create(
+            $_SESSION["customer_id"],
+            $rating,
+            $comment
+          )
+        ) {
 
-        if ($review->create()) {
             $success = "Thank you! Your review has been submitted and is waiting for approval.";
         } else {
             $error = "Something went wrong. Please try again.";
@@ -56,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         .review-page {
             min-height: 80vh;
             display: flex;
+            background: url('assets/images/pattern2.png') no-repeat center center/cover;
             justify-content: center;
             align-items: center;
             padding: 70px 20px;
@@ -197,8 +200,89 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 
 <body>
+<header class="header">
 
-<?php include "includes/header.php"; ?>
+    <div class="container navbar">
+
+        <a href="index.php" class="logo">
+            <img
+                src="assets/images/logo.png"
+                alt="NAVA Fade Studio Logo"
+            >
+        </a>
+
+        <nav>
+
+            <a href="index.php">
+                Home
+            </a>
+
+            <a href="about.php">
+                About Us
+            </a>
+
+            <a href="index.php#services">
+                Service
+            </a>
+
+            <a href="shop.php">
+                Shop
+            </a>
+
+            <a href="blog.php">
+                Blog
+            </a>
+
+            <a href="book.php" class="nav-button">
+                Book Now
+            </a>
+
+            <div class="customer-menu">
+
+                <button
+                    class="customer-menu-btn"
+                    type="button"
+                    onclick="toggleCustomerMenu()"
+                >
+                    👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+
+                <div
+                    class="customer-dropdown"
+                    id="customerDropdown"
+                >
+
+                    <a href="my-orders.php">
+                        🛍️ My Orders
+                    </a>
+
+                    <a href="appointments.php">
+                        📅 My Appointments
+                    </a>
+
+                    <a href="review.php">
+                        ⭐ Write a Review
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <a
+                        href="logout.php"
+                        class="logout-link"
+                    >
+                        🚪 Logout
+                    </a>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </div>
+
+</header>
 
 <div class="review-page">
 
@@ -283,6 +367,130 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
 
 </div>
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="footer">
+
+
+    <div class="footer-content">
+
+
+        <!-- BRAND -->
+
+        <div>
+
+            <img
+                src="assets/images/logo.png"
+                class="footer-logo"
+                alt="NAVA Fade Studio Logo"
+            >
+
+
+            <p>
+
+                NAVA Fade Studio is dedicated to
+                delivering clean, modern, and
+                personalized grooming experiences.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- ABOUT LINKS -->
+
+        <div>
+
+            <h3>
+                About
+            </h3>
+
+
+            <a href="about.php">
+                About Us
+            </a>
+
+            <a href="#services">
+                Services
+            </a>
+
+            <a href="shop.php">
+                Shop
+            </a>
+
+            <a href="blog.php">
+                Blog
+            </a>
+
+        </div>
+
+
+
+        <!-- SUPPORT -->
+
+        <div>
+
+            <h3>
+                Support
+            </h3>
+
+
+            <a href="about.php">
+                Who We Are
+            </a>
+
+            <a href="#services">
+                Our Services
+            </a>
+
+            <a href="book.php">
+                Book Appointment
+            </a>
+
+            <a href="#">
+                Contact Us
+            </a>
+
+        </div>
+
+
+
+        <!-- ADDRESS -->
+
+        <div>
+
+            <h3>
+                Address
+            </h3>
+
+
+            <!-- KEEP YOUR EXISTING ADDRESS -->
+
+            <p>
+                Your current address here
+            </p>
+
+
+            <p>
+                📧 navafadestudio@gmail.com
+            </p>
+
+
+            <p>
+                📞 0969 407 4629
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</footer>
 
 </body>
 </html>

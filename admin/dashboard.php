@@ -566,7 +566,7 @@ try {
         </a>
 
 
-        <a href="#">
+        <a href="reviews.php">
             Reviews
         </a>
 

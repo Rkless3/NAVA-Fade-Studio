@@ -110,6 +110,10 @@ $services = $serviceObject->getAll();
                         <a href="appointments.php">
                             📅 My Appointments
                         </a>
+                        
+                        <a href="review.php">
+                            ⭐ Write a Review
+                        </a>
 
                     <div class="dropdown-divider"></div>
 
