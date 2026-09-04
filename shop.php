@@ -129,6 +129,10 @@ $products = $productModel->getActive();
                 Service
             </a>
 
+            <a href="reviews.php">
+                Reviews
+            </a>
+
             <a href="shop.php" class="active">
                 Shop
             </a>
@@ -453,19 +457,9 @@ $products = $productModel->getActive();
 
             <!-- KEEP YOUR EXISTING ADDRESS -->
 
-            <p>
-                Your current address here
-            </p>
-
-
-            <p>
-                📧 navafadestudio@gmail.com
-            </p>
-
-
-            <p>
-                📞 0969 407 4629
-            </p>
+            <p>📍 Amlan, Negros Oriental</p>
+            <p>📧 navafadestudio@gmail.com</p>
+            <p>📞 0969 407 4629</p>
 
         </div>
 

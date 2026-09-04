@@ -2,73 +2,91 @@
 
 class Review
 {
-    private PDO $conn;
+    private PDO $db;
 
     public function __construct(PDO $db)
     {
-        $this->conn = $db;
+        $this->db = $db;
     }
 
 
     /* =========================================
        GET ALL REVIEWS
-    ========================================= */
+       ========================================= */
 
     public function getAll(): array
     {
-        $query = "
+        $query = $this->db->prepare("
             SELECT
-                r.id,
-                r.customer_id,
-                r.rating,
-                r.comment,
-                r.status,
-                r.created_at,
-                c.full_name,
-                c.email
+                r.*,
+                c.full_name AS customer_name,
+                c.email AS customer_email
             FROM reviews r
             INNER JOIN customers c
-                ON c.id = r.customer_id
-            ORDER BY r.id DESC
-        ";
+                ON r.customer_id = c.id
+            ORDER BY r.created_at DESC
+        ");
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
+        $query->execute();
 
-        return $stmt->fetchAll();
+        return $query->fetchAll();
     }
 
 
     /* =========================================
        GET APPROVED REVIEWS
-    ========================================= */
+       ========================================= */
 
     public function getApproved(): array
     {
-        $query = "
+        $query = $this->db->prepare("
             SELECT
-                r.id,
-                r.rating,
-                r.comment,
-                r.created_at,
-                c.full_name
+                r.*,
+                c.full_name AS customer_name,
+                c.email AS customer_email
             FROM reviews r
             INNER JOIN customers c
-                ON c.id = r.customer_id
+                ON r.customer_id = c.id
             WHERE r.status = 'Approved'
-            ORDER BY r.id DESC
-        ";
+            ORDER BY r.created_at DESC
+        ");
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
+        $query->execute();
 
-        return $stmt->fetchAll();
+        return $query->fetchAll();
+    }
+
+
+    /* =========================================
+       GET FEATURED REVIEW
+       ========================================= */
+
+    public function getFeatured(): ?array
+    {
+        $query = $this->db->prepare("
+            SELECT
+                r.*,
+                c.full_name AS customer_name,
+                c.email AS customer_email
+            FROM reviews r
+            INNER JOIN customers c
+                ON r.customer_id = c.id
+            WHERE r.status = 'Approved'
+            AND r.is_featured = 1
+            LIMIT 1
+        ");
+
+        $query->execute();
+
+        $review = $query->fetch();
+
+        return $review ?: null;
     }
 
 
     /* =========================================
        CREATE REVIEW
-    ========================================= */
+       ========================================= */
 
     public function create(
         int $customer_id,
@@ -76,97 +94,152 @@ class Review
         string $comment
     ): bool {
 
-        $query = "
-            INSERT INTO reviews
-            (
+        $query = $this->db->prepare("
+            INSERT INTO reviews (
                 customer_id,
                 rating,
                 comment,
-                status
+                status,
+                is_featured
             )
-            VALUES
-            (
+            VALUES (
                 :customer_id,
                 :rating,
                 :comment,
-                'Pending'
+                'Pending',
+                0
             )
-        ";
+        ");
 
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(
-            ":customer_id",
-            $customer_id,
-            PDO::PARAM_INT
-        );
-
-        $stmt->bindParam(
-            ":rating",
-            $rating,
-            PDO::PARAM_INT
-        );
-
-        $stmt->bindParam(
-            ":comment",
-            $comment
-        );
-
-        return $stmt->execute();
+        return $query->execute([
+            ":customer_id" => $customer_id,
+            ":rating" => $rating,
+            ":comment" => $comment
+        ]);
     }
 
 
     /* =========================================
-       UPDATE STATUS
-    ========================================= */
+       UPDATE REVIEW STATUS
+       ========================================= */
 
     public function updateStatus(
         int $review_id,
         string $status
     ): bool {
 
-        $query = "
+        /*
+         * If the review is no longer approved,
+         * it cannot remain featured.
+         */
+
+        if ($status !== "Approved") {
+
+            $clearFeatured = $this->db->prepare("
+                UPDATE reviews
+                SET is_featured = 0
+                WHERE id = :id
+            ");
+
+            $clearFeatured->execute([
+                ":id" => $review_id
+            ]);
+        }
+
+
+        $query = $this->db->prepare("
             UPDATE reviews
             SET status = :status
             WHERE id = :id
-        ";
+        ");
 
-        $stmt = $this->conn->prepare($query);
+        return $query->execute([
+            ":status" => $status,
+            ":id" => $review_id
+        ]);
+    }
 
-        $stmt->bindParam(
-            ":status",
-            $status
-        );
 
-        $stmt->bindParam(
-            ":id",
-            $review_id,
-            PDO::PARAM_INT
-        );
+    /* =========================================
+       SET REVIEW AS FEATURED
+       ========================================= */
 
-        return $stmt->execute();
+    public function setFeatured(int $review_id): bool
+    {
+        try {
+
+            $this->db->beginTransaction();
+
+
+            /*
+             * Remove featured status
+             * from every review.
+             */
+
+            $clearAll = $this->db->prepare("
+                UPDATE reviews
+                SET is_featured = 0
+            ");
+
+            $clearAll->execute();
+
+
+            /*
+             * Set selected review as featured,
+             * but only if it is approved.
+             */
+
+            $setFeatured = $this->db->prepare("
+                UPDATE reviews
+                SET is_featured = 1
+                WHERE id = :id
+                AND status = 'Approved'
+            ");
+
+            $setFeatured->execute([
+                ":id" => $review_id
+            ]);
+
+
+            /*
+             * Make sure the selected review
+             * actually exists and is approved.
+             */
+
+            if ($setFeatured->rowCount() === 0) {
+                $this->db->rollBack();
+                return false;
+            }
+
+
+            $this->db->commit();
+
+            return true;
+
+        } catch (PDOException $e) {
+
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+
+            return false;
+        }
     }
 
 
     /* =========================================
        DELETE REVIEW
-    ========================================= */
+       ========================================= */
 
     public function delete(int $review_id): bool
     {
-        $query = "
+        $query = $this->db->prepare("
             DELETE FROM reviews
             WHERE id = :id
-        ";
+        ");
 
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(
-            ":id",
-            $review_id,
-            PDO::PARAM_INT
-        );
-
-        return $stmt->execute();
+        return $query->execute([
+            ":id" => $review_id
+        ]);
     }
 }

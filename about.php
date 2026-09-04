@@ -34,6 +34,8 @@ session_start();
 
             <a href="index.php#services">Service</a>
 
+            <a href="reviews.php">Reviews</a>
+
             <a href="shop.php">Shop</a>
 
             <a href="blog.php">Blog</a>
@@ -120,11 +122,6 @@ session_start();
 
         <div class="about-gold-line"></div>
 
-        <p>
-            A modern barbershop experience built around
-            quality grooming, personal style, and customer satisfaction.
-        </p>
-
     </div>
 
 </section>
@@ -153,7 +150,7 @@ session_start();
         </span>
 
         <h2>
-            WE ARE <span>NAVA FADE STUDIO</span>
+            WE ARE <span>NAVA <br>FADE STUDIO</span>
         </h2>
 
         <p>
@@ -181,35 +178,43 @@ session_start();
 </section>
 
 
-<!-- =========================
-     OUR MISSION
-========================= -->
+<!-- =====================================================
+     ABOUT HERO / OUR MISSION
+===================================================== -->
 
 <section class="about-mission">
 
-    <div class="about-mission-content">
+    <div class="about-mission-hero">
 
-        <span class="about-small-title">
-            OUR MISSION
-        </span>
+        <div class="about-mission-overlay"></div>
 
-        <h2>
-            QUALITY GROOMING.
-            <span>BETTER EXPERIENCE.</span>
-        </h2>
+        <div class="about-mission-content">
 
-        <p>
-            Our mission is to provide reliable and quality
-            grooming services while creating a welcoming
-            environment for every customer.
-        </p>
+            <span class="mission-label">
+                OUR MISSION
+            </span>
 
-        <p>
-            NAVA Fade Studio aims to combine skilled
-            barbers, quality services, and convenient
-            appointment booking to make every visit simple
-            and enjoyable.
-        </p>
+            <h1>
+                QUALITY GROOMING.
+                <br>
+                <strong>BETTER EXPERIENCE.</strong>
+            </h1>
+
+            <div class="mission-line"></div>
+
+            <p>
+                Our mission is to provide reliable and quality
+                grooming services while creating a welcoming
+                environment for every customer.
+            </p>
+
+            <p>
+                NAVA Fade Studio aims to combine skilled barbers,
+                quality services, and convenient appointment
+                booking to make every visit simple and enjoyable.
+            </p>
+
+        </div>
 
     </div>
 
@@ -294,37 +299,6 @@ session_start();
             </p>
 
         </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     BOOKING CTA
-========================= -->
-
-<section class="about-cta">
-
-    <div class="about-cta-content">
-
-        <span>
-            LOOKING FOR YOUR NEXT STYLE?
-        </span>
-
-        <h2>
-            LET'S MAKE YOU
-            <strong>LOOK YOUR BEST.</strong>
-        </h2>
-
-        <p>
-            Choose your service and book your appointment
-            with NAVA Fade Studio today.
-        </p>
-
-        <a href="book.php" class="about-cta-button">
-            BOOK YOUR APPOINTMENT
-        </a>
 
     </div>
 
@@ -420,17 +394,9 @@ session_start();
                 Contact Us
             </h3>
 
-            <p>
-                Jugno, Amlan Negros Oriental
-            </p>
-
-            <p>
-                navafadestudio@gmail.com
-            </p>
-
-            <p>
-                0969 407 4629
-            </p>
+            <p>📍 Amlan, Negros Oriental</p>
+            <p>📧 navafadestudio@gmail.com</p>
+            <p>📞 0969 407 4629</p>
 
         </div>
 

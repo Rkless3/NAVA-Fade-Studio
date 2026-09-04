@@ -2,11 +2,6 @@
 
 session_start();
 
-if (!isset($_SESSION["customer_id"])) {
-    header("Location: login.php");
-    exit;
-}
-
 require_once "config/Database.php";
 require_once "classes/Review.php";
 
@@ -67,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         .review-container {
             width: 100%;
             max-width: 650px;
-            background: #fff;
+            background: #151c2d;
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
@@ -76,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         .review-container h1 {
             text-align: center;
             margin-bottom: 10px;
-            color: #111;
+            color: #fff;
         }
 
         .review-subtitle {
@@ -111,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             display: block;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #222;
+            color: #fff;
         }
 
         .stars {
@@ -225,6 +220,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 Service
             </a>
 
+            <a
+                href="reviews.php"
+                class="active"
+            >
+                Reviews
+            </a>
+
             <a href="shop.php">
                 Shop
             </a>
@@ -237,46 +239,60 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 Book Now
             </a>
 
-            <div class="customer-menu">
+            <?php if (isset($_SESSION["customer_id"])): ?>
 
-                <button
-                    class="customer-menu-btn"
-                    type="button"
-                    onclick="toggleCustomerMenu()"
-                >
-                    👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
-                    <span class="dropdown-arrow">▼</span>
-                </button>
+                <div class="customer-menu">
 
-                <div
-                    class="customer-dropdown"
-                    id="customerDropdown"
-                >
+                    <button
+                        class="customer-menu-btn"
+                        type="button"
+                        onclick="toggleCustomerMenu()"
+                    >
 
-                    <a href="my-orders.php">
-                        🛍️ My Orders
-                    </a>
+                        👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
 
-                    <a href="appointments.php">
-                        📅 My Appointments
-                    </a>
+                        <span class="dropdown-arrow">▼</span>
 
-                    <a href="review.php">
-                        ⭐ Write a Review
-                    </a>
+                    </button>
+
+
+                    <div
+                        class="customer-dropdown"
+                        id="customerDropdown"
+                    >
+
+                        <a href="my-orders.php">
+                            🛍️ My Orders
+                        </a>
+
+                        <a href="appointments.php">
+                            📅 My Appointments
+                        </a>
+
+                        <a href="review.php">
+                            ⭐ Write a Review
+                        </a>
 
                     <div class="dropdown-divider"></div>
 
-                    <a
-                        href="logout.php"
-                        class="logout-link"
-                    >
-                        🚪 Logout
-                    </a>
+                        <a
+                            href="logout.php"
+                            class="logout-link"
+                        >
+                            🚪 Logout
+                        </a>
+
+                    </div>
 
                 </div>
 
-            </div>
+            <?php else: ?>
+
+                <a href="register.php" class="nav-button">
+                    Register
+                </a>
+
+            <?php endif; ?>
 
         </nav>
 
@@ -471,7 +487,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <!-- KEEP YOUR EXISTING ADDRESS -->
 
             <p>
-                Your current address here
+                📍 Amlan, Negros Oriental
             </p>
 
 

@@ -23,6 +23,7 @@ if (
 require_once "../config/Database.php";
 require_once "../classes/Review.php";
 
+
 $database = new Database();
 $db = $database->connect();
 
@@ -38,6 +39,7 @@ $allowedStatuses = [
     "Approved",
     "Hidden"
 ];
+
 
 $message = "";
 
@@ -89,6 +91,41 @@ if (
 
 
 /* =========================================
+   SET FEATURED REVIEW
+========================================= */
+
+if (
+    $_SERVER["REQUEST_METHOD"] === "POST" &&
+    isset($_POST["set_featured"])
+) {
+
+    $review_id = (int) ($_POST["review_id"] ?? 0);
+
+
+    if ($review_id > 0) {
+
+        if (
+            $reviewModel->setFeatured(
+                $review_id
+            )
+        ) {
+
+            header(
+                "Location: reviews.php?message=featured"
+            );
+
+            exit;
+
+        } else {
+
+            $message =
+                "Failed to set homepage review.";
+        }
+    }
+}
+
+
+/* =========================================
    DELETE REVIEW
 ========================================= */
 
@@ -103,7 +140,9 @@ if (
     if ($review_id > 0) {
 
         if (
-            $reviewModel->delete($review_id)
+            $reviewModel->delete(
+                $review_id
+            )
         ) {
 
             header(
@@ -145,6 +184,16 @@ if (
 }
 
 
+if (
+    isset($_GET["message"]) &&
+    $_GET["message"] === "featured"
+) {
+
+    $message =
+        "Homepage review updated successfully.";
+}
+
+
 /* =========================================
    GET REVIEWS
 ========================================= */
@@ -155,16 +204,19 @@ $reviews = $reviewModel->getAll();
 
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+
 
     <title>
         Reviews | NAVA Fade Studio
@@ -210,12 +262,15 @@ $reviews = $reviewModel->getAll();
         ===================================== */
 
         .admin-header {
+
             width: 100%;
 
             height: 80px;
 
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
 
             padding: 0 50px;
@@ -225,6 +280,7 @@ $reviews = $reviewModel->getAll();
             border-bottom: 2px solid #b8862c;
 
             position: sticky;
+
             top: 0;
 
             z-index: 1000;
@@ -232,7 +288,9 @@ $reviews = $reviewModel->getAll();
 
 
         .admin-logo {
+
             display: flex;
+
             align-items: center;
 
             gap: 15px;
@@ -240,17 +298,25 @@ $reviews = $reviewModel->getAll();
 
 
         .admin-logo img {
+
             width: 165px;
+
             height: 165px;
 
             object-fit: contain;
         }
 
+
         .admin-user {
+
             display: flex;
+
             align-items: center;
+
             gap: 25px;
+
             font-size: 16px;
+
             font-weight: bold;
         }
 
@@ -288,7 +354,8 @@ $reviews = $reviewModel->getAll();
 
             display: flex;
 
-            min-height: calc(100vh - 80px);
+            min-height:
+                calc(100vh - 80px);
         }
 
 
@@ -302,9 +369,12 @@ $reviews = $reviewModel->getAll();
 
             padding: 35px 20px;
 
-            background: rgba(14, 20, 35, 0.95);
+            background:
+                rgba(14, 20, 35, 0.95);
 
-            border-right: 1px solid rgba(184, 134, 44, 0.5);
+            border-right:
+                1px solid
+                rgba(184, 134, 44, 0.5);
         }
 
 
@@ -344,6 +414,7 @@ $reviews = $reviewModel->getAll();
 
         .sidebar a:hover,
         .sidebar a.active {
+
             background: #b8862c;
 
             color: #0e1423;
@@ -411,6 +482,39 @@ $reviews = $reviewModel->getAll();
 
 
         /* =====================================
+           HOMEPAGE NOTICE
+        ===================================== */
+
+        .featured-notice {
+
+            background:
+                rgba(184, 134, 44, 0.10);
+
+            border:
+                1px solid
+                rgba(184, 134, 44, 0.6);
+
+            color: #dfe3ea;
+
+            padding: 15px 18px;
+
+            border-radius: 9px;
+
+            margin-bottom: 25px;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+
+        .featured-notice strong {
+
+            color: #d19a2a;
+        }
+
+
+        /* =====================================
            TABLE
         ===================================== */
 
@@ -436,7 +540,7 @@ $reviews = $reviewModel->getAll();
 
             width: 100%;
 
-            min-width: 1000px;
+            min-width: 1150px;
 
             border-collapse: collapse;
         }
@@ -585,6 +689,69 @@ $reviews = $reviewModel->getAll();
                 rgba(158, 158, 158, 0.15);
 
             color: #bdbdbd;
+        }
+
+
+        /* =====================================
+           HOMEPAGE FEATURED
+        ===================================== */
+
+        .featured-badge {
+
+            display: inline-block;
+
+            padding: 8px 12px;
+
+            border-radius: 20px;
+
+            background: #b8862c;
+
+            color: #0e1423;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+
+        .feature-btn {
+
+            background: transparent;
+
+            color: #b8862c;
+
+            border:
+                1px solid #b8862c;
+
+            border-radius: 7px;
+
+            padding: 9px 12px;
+
+            font-family: inherit;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+
+        .feature-btn:hover {
+
+            background: #b8862c;
+
+            color: #0e1423;
+        }
+
+
+        .feature-disabled {
+
+            color: #777;
+
+            font-size: 13px;
         }
 
 
@@ -759,6 +926,8 @@ $reviews = $reviewModel->getAll();
             .admin-logo img {
 
                 width: 130px;
+
+                height: 130px;
             }
 
 
@@ -834,6 +1003,7 @@ $reviews = $reviewModel->getAll();
 
 <header class="admin-header">
 
+
     <div class="admin-logo">
 
         <img
@@ -865,9 +1035,14 @@ $reviews = $reviewModel->getAll();
 
     </div>
 
+
 </header>
 
 
+
+<!-- =====================================
+     LAYOUT
+===================================== -->
 
 <div class="admin-layout">
 
@@ -877,6 +1052,7 @@ $reviews = $reviewModel->getAll();
     ================================== -->
 
     <aside class="sidebar">
+
 
         <div class="sidebar-title">
             ADMIN PANEL
@@ -920,6 +1096,7 @@ $reviews = $reviewModel->getAll();
             Settings
         </a>
 
+
     </aside>
 
 
@@ -937,6 +1114,7 @@ $reviews = $reviewModel->getAll();
                 Reviews
             </h1>
 
+
             <p>
                 View and manage customer reviews
                 and feedback.
@@ -946,7 +1124,9 @@ $reviews = $reviewModel->getAll();
 
 
 
-        <!-- MESSAGE -->
+        <!-- =================================
+             MESSAGE
+        ================================= -->
 
         <?php if (!empty($message)): ?>
 
@@ -960,11 +1140,34 @@ $reviews = $reviewModel->getAll();
 
 
 
-        <!-- REVIEWS TABLE -->
+        <!-- =================================
+             HOMEPAGE NOTICE
+        ================================= -->
+
+        <div class="featured-notice">
+
+            <strong>
+                ⭐ Homepage Review:
+            </strong>
+
+            Choose one approved review to display
+            in the homepage's
+            "We Are Happy to Make You Handsome"
+            section.
+
+        </div>
+
+
+
+        <!-- =================================
+             REVIEWS TABLE
+        ================================= -->
 
         <div class="table-container">
 
+
             <?php if (empty($reviews)): ?>
+
 
                 <div class="empty-reviews">
 
@@ -972,9 +1175,12 @@ $reviews = $reviewModel->getAll();
 
                 </div>
 
+
             <?php else: ?>
 
+
                 <table>
+
 
                     <thead>
 
@@ -984,21 +1190,31 @@ $reviews = $reviewModel->getAll();
                                 Customer
                             </th>
 
+
                             <th>
                                 Rating
                             </th>
+
 
                             <th>
                                 Review
                             </th>
 
+
                             <th>
                                 Status
                             </th>
 
+
+                            <th>
+                                Homepage
+                            </th>
+
+
                             <th>
                                 Date
                             </th>
+
 
                             <th>
                                 Action
@@ -1009,9 +1225,12 @@ $reviews = $reviewModel->getAll();
                     </thead>
 
 
+
                     <tbody>
 
+
                         <?php foreach ($reviews as $review): ?>
+
 
                             <tr>
 
@@ -1020,19 +1239,23 @@ $reviews = $reviewModel->getAll();
 
                                 <td>
 
-                                    <div class="customer-name">
+                                    <div
+                                        class="customer-name"
+                                    >
 
                                         <?= htmlspecialchars(
-                                            $review["full_name"]
+                                            $review["customer_name"]
                                         ) ?>
 
                                     </div>
 
 
-                                    <div class="customer-email">
+                                    <div
+                                        class="customer-email"
+                                    >
 
                                         <?= htmlspecialchars(
-                                            $review["email"]
+                                            $review["customer_email"]
                                         ) ?>
 
                                     </div>
@@ -1065,7 +1288,9 @@ $reviews = $reviewModel->getAll();
                                     </span>
 
 
-                                    <span class="rating-number">
+                                    <span
+                                        class="rating-number"
+                                    >
 
                                         <?= (int) $review["rating"] ?>/5
 
@@ -1079,7 +1304,9 @@ $reviews = $reviewModel->getAll();
 
                                 <td>
 
-                                    <div class="review-comment">
+                                    <div
+                                        class="review-comment"
+                                    >
 
                                         <?= nl2br(
                                             htmlspecialchars(
@@ -1106,6 +1333,7 @@ $reviews = $reviewModel->getAll();
 
                                     ?>
 
+
                                     <span
                                         class="status status-<?= htmlspecialchars(
                                             $statusClass
@@ -1122,11 +1350,89 @@ $reviews = $reviewModel->getAll();
 
 
 
+                                <!-- HOMEPAGE -->
+
+                                <td>
+
+
+                                    <?php if (
+                                        $review["status"] === "Approved"
+                                    ): ?>
+
+
+                                        <?php if (
+                                            (int) $review["is_featured"] === 1
+                                        ): ?>
+
+
+                                            <span
+                                                class="featured-badge"
+                                            >
+
+                                                ⭐ Shown
+
+                                            </span>
+
+
+                                        <?php else: ?>
+
+
+                                            <form
+                                                method="POST"
+                                                action="reviews.php"
+                                            >
+
+
+                                                <input
+                                                    type="hidden"
+                                                    name="review_id"
+                                                    value="<?= (int) $review["id"] ?>"
+                                                >
+
+
+                                                <button
+                                                    type="submit"
+                                                    name="set_featured"
+                                                    class="feature-btn"
+                                                >
+
+                                                    Show on Homepage
+
+                                                </button>
+
+
+                                            </form>
+
+
+                                        <?php endif; ?>
+
+
+                                    <?php else: ?>
+
+
+                                        <span
+                                            class="feature-disabled"
+                                        >
+
+                                            Approve first
+
+                                        </span>
+
+
+                                    <?php endif; ?>
+
+
+                                </td>
+
+
+
                                 <!-- DATE -->
 
                                 <td>
 
-                                    <div class="review-date">
+                                    <div
+                                        class="review-date"
+                                    >
 
                                         <?= date(
                                             "M d, Y",
@@ -1135,7 +1441,9 @@ $reviews = $reviewModel->getAll();
                                             )
                                         ) ?>
 
+
                                         <br>
+
 
                                         <?= date(
                                             "h:i A",
@@ -1155,11 +1463,14 @@ $reviews = $reviewModel->getAll();
                                 <td>
 
 
+                                    <!-- UPDATE STATUS -->
+
                                     <form
                                         method="POST"
                                         action="reviews.php"
                                         class="status-form"
                                     >
+
 
                                         <input
                                             type="hidden"
@@ -1173,10 +1484,12 @@ $reviews = $reviewModel->getAll();
                                             class="status-select"
                                         >
 
+
                                             <?php foreach (
                                                 $allowedStatuses
                                                 as $status
                                             ): ?>
+
 
                                                 <option
                                                     value="<?= htmlspecialchars($status) ?>"
@@ -1191,7 +1504,9 @@ $reviews = $reviewModel->getAll();
 
                                                 </option>
 
+
                                             <?php endforeach; ?>
+
 
                                         </select>
 
@@ -1201,12 +1516,17 @@ $reviews = $reviewModel->getAll();
                                             name="update_status"
                                             class="update-btn"
                                         >
+
                                             Update
+
                                         </button>
+
 
                                     </form>
 
 
+
+                                    <!-- DELETE -->
 
                                     <form
                                         method="POST"
@@ -1214,6 +1534,7 @@ $reviews = $reviewModel->getAll();
                                         class="delete-form"
                                         onsubmit="return confirm('Delete this review?');"
                                     >
+
 
                                         <input
                                             type="hidden"
@@ -1227,28 +1548,38 @@ $reviews = $reviewModel->getAll();
                                             name="delete_review"
                                             class="delete-btn"
                                         >
+
                                             Delete
+
                                         </button>
+
 
                                     </form>
 
 
                                 </td>
 
+
                             </tr>
+
 
                         <?php endforeach; ?>
 
+
                     </tbody>
+
 
                 </table>
 
+
             <?php endif; ?>
+
 
         </div>
 
 
     </main>
+
 
 </div>
 

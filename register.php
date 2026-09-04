@@ -102,7 +102,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="booking-header">
 
-                <h1>NAVA FADE STUDIO</h1>
+                <img
+                    src="../assets/images/logo.png"
+                    alt="NAVA Fade Studio Logo"
+                    class="login-logo"
+                >
 
                 <h2>Create Your Account</h2>
 

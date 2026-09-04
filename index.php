@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-
 require_once "config/Database.php";
 require_once "classes/Service.php";
+require_once "classes/Review.php";
 
 $database = new Database();
 $db = $database->connect();
@@ -11,6 +11,8 @@ $db = $database->connect();
 $serviceObject = new Service($db);
 $services = $serviceObject->getAll();
 
+$reviewObject = new Review($db);
+$featuredReview = $reviewObject->getFeatured();
 ?>
 
 <!DOCTYPE html>
@@ -67,6 +69,10 @@ $services = $serviceObject->getAll();
 
             <a href="#services">
                 Service
+            </a>
+
+            <a href="reviews.php">
+                Reviews
             </a>
 
             <a href="shop.php">
@@ -496,7 +502,7 @@ $services = $serviceObject->getAll();
             <div class="review-header">
 
                 <div class="review-avatar">
-                    M
+                    R
                 </div>
 
                 <div class="review-user">
@@ -728,42 +734,48 @@ $services = $serviceObject->getAll();
 
 
 <!-- =====================================================
-     DISCOUNT / BOOKING CTA
+     BOOKING CTA
 ===================================================== -->
 
-<section class="discount">
+<section class="about-booking-cta">
 
+    <div class="about-booking-card">
 
-    <h2>
+        <div class="about-booking-overlay"></div>
 
-        Get
-        <span>20% Off</span>
-        Your First Booking
+        <div class="about-booking-content">
 
-    </h2>
+            <span class="booking-label">
+                READY FOR A FRESH LOOK?
+            </span>
 
+            <h2>
+                GET <span>20% OFF</span>
+                <br>
+                YOUR FIRST BOOKING
+            </h2>
 
-    <p>
+            <div class="booking-line"></div>
 
-        Ready for a fresh new look?
-        Book your appointment with NAVA Fade Studio
-        and enjoy 20% off your first visit.
+            <p>
+                Book your appointment with NAVA Fade Studio
+                and enjoy 20% off your first visit.
+            </p>
 
-    </p>
+            <p>
+                Let our skilled barbers give you a clean,
+                sharp, and confident style tailored just for you.
+            </p>
 
+            <a href="book.php" class="booking-cta-button">
+                BOOK AN APPOINTMENT
+            </a>
 
-    <a
-        href="book.php"
-        class="cta-button"
-    >
+        </div>
 
-        Book An Appointment
-
-    </a>
-
+    </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -868,19 +880,11 @@ $services = $serviceObject->getAll();
 
             <!-- KEEP YOUR EXISTING ADDRESS -->
 
-            <p>
-                Your current address here
-            </p>
+            <p>📍 Amlan, Negros Oriental</p>
 
+            <p>📧 navafadestudio@gmail.com</p>
 
-            <p>
-                📧 navafadestudio@gmail.com
-            </p>
-
-
-            <p>
-                📞 0969 407 4629
-            </p>
+            <p>📞 0969 407 4629</p>
 
         </div>
 

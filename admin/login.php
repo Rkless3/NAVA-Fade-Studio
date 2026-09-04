@@ -238,8 +238,6 @@ k
             class="login-logo"
         >
 
-        <h1>NAVA Fade Studio</h1>
-
         <p class="subtitle">
             Administrator Login
         </p>

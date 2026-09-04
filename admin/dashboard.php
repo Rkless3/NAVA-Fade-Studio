@@ -688,7 +688,7 @@ try {
 
 
             <a
-                href="#"
+                href="reviews.php"
                 class="action-card"
             >
 
