@@ -613,7 +613,7 @@ try {
 
 
         <a
-            href="logout.php"
+            href="../logout.php"
             class="logout-btn"
         >
 

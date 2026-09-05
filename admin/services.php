@@ -665,7 +665,7 @@ $services = $service->getAll();
         </span>
 
         <a
-            href="logout.php"
+            href="../logout.php"
             class="logout-btn"
         >
             Logout

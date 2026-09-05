@@ -1021,7 +1021,7 @@ $reviews = $reviewModel->getAll();
 
 
         <a
-            href="logout.php"
+            href="../logout.php"
             class="logout-btn"
         >
             Logout

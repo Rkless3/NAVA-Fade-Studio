@@ -599,7 +599,7 @@ foreach ($orders as $order) {
             Welcome, <?= htmlspecialchars($_SESSION["admin_username"] ?? "Admin") ?>
         </span>
 
-        <a href="logout.php" class="logout-btn">
+        <a href="../logout.php" class="logout-btn">
             Logout
         </a>
 
