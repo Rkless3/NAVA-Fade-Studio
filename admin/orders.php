@@ -105,9 +105,12 @@ foreach ($orders as $order) {
         body {
             font-family: Bahnschrift, "Myriad Pro", Arial, sans-serif;
             background:
-                linear-gradient(rgba(14, 20, 35, 0.93), rgba(14, 20, 35, 0.93)),
-                url("../assets/images/pattern2.png");
-            background-size: 300px;
+                url("../assets/images/pattern3.png");
+
+            background-size: cover;
+
+            background-position: center;
+            
             color: white;
             min-height: 100vh;
         }
@@ -120,7 +123,7 @@ foreach ($orders as $order) {
         .admin-header {
             width: 100%;
 
-            height: 80px;
+            height: 95px;
 
             display: flex;
             align-items: center;

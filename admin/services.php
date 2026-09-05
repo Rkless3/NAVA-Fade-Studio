@@ -133,7 +133,7 @@ $services = $service->getAll();
 
             background:
                 
-                url("../assets/images/pattern2.png");
+                url("../assets/images/pattern3.png");
 
             background-size: cover;
 
@@ -151,7 +151,7 @@ $services = $service->getAll();
         .admin-header {
             width: 100%;
 
-            height: 80px;
+            height: 95px;
 
             display: flex;
             align-items: center;

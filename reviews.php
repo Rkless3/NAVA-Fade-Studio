@@ -95,9 +95,9 @@ $reviewCount = count($approvedReviews);
 
             background:
                 linear-gradient(
-                    90deg,
+                    120deg,
                     rgba(7, 14, 29, 0.92),
-                    rgba(7, 14, 29, 0.72),
+                    rgba(16, 31, 64, 0.72),
                     rgba(7, 14, 29, 0.88)
                 );
 

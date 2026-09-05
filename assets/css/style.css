@@ -1132,7 +1132,7 @@ img {
 .shop-grid {
     
     width: 100%;
-    max-width: 1320px;
+    max-width: 1200px;
     margin: 0 auto;
 
     display: grid;
@@ -2918,7 +2918,7 @@ img {
 
     background:
     
-        url("../images/pattern2.png");
+        url("../images/pattern3.png");
 
     background-size: cover;
     background-position: center;
@@ -2960,7 +2960,7 @@ img {
 
     gap: 30px;
 
-    max-width: 1200px;
+    max-width: 1000px;
 
     margin: auto;
 }
@@ -2973,7 +2973,7 @@ img {
 
     background: #0e1423;
 
-    border: 3px solid
+    border: 5px solid
         rgba(184, 134, 44, 0.4);
 
     border-radius: 18px;
@@ -2986,7 +2986,7 @@ img {
 
     background: #0e1423;
 
-    border: 3px solid
+    border: 5px solid
         rgba(184, 134, 44, 0.4);
 
     border-radius: 18px;
@@ -2998,7 +2998,7 @@ img {
 .shop-product-card:hover {
     transform: translateY(-8px);
 
-    border: 3px solid;
+    border: 6px solid;
 
     border-color: #b8862c;
 }
@@ -3006,7 +3006,7 @@ img {
 .shop-product-card1:hover {
     transform: translateY(-8px);
 
-    border: 3px solid;
+    border: 6px solid;
 
     border-color: #b8862c;
 }
@@ -3023,7 +3023,6 @@ img {
 
     justify-content: center;
 
-    background: #ffffff;
 }
 
 

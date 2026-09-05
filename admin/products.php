@@ -222,7 +222,7 @@ $products = $product->getAll();
             font-family: Bahnschrift, Myriad Pro;
 
             background:
-                url("../assets/images/pattern2.png");
+                url("../assets/images/pattern3.png");
 
             background-size: cover;
 
@@ -239,22 +239,21 @@ $products = $product->getAll();
 
         .admin-header {
 
-            height: 80px;
+            width: 100%;
 
-            padding: 0 50px;
+            height: 95px;
 
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
+
+            padding: 0 50px;
 
             background: #0e1423;
 
             border-bottom: 2px solid #b8862c;
 
             position: sticky;
-
             top: 0;
 
             z-index: 1000;

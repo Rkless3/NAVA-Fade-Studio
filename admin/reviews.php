@@ -242,14 +242,11 @@ $reviews = $reviewModel->getAll();
 
             background:
 
-                linear-gradient(
-                    rgba(14, 20, 35, 0.93),
-                    rgba(14, 20, 35, 0.93)
-                ),
+                url("../assets/images/pattern3.png");
 
-                url("../assets/images/pattern2.png");
+            background-size: cover;
 
-            background-size: 300px;
+            background-position: center;
 
             color: white;
 
@@ -265,12 +262,10 @@ $reviews = $reviewModel->getAll();
 
             width: 100%;
 
-            height: 80px;
+            height: 95px;
 
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
 
             padding: 0 50px;
@@ -280,7 +275,6 @@ $reviews = $reviewModel->getAll();
             border-bottom: 2px solid #b8862c;
 
             position: sticky;
-
             top: 0;
 
             z-index: 1000;

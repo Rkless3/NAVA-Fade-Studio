@@ -181,7 +181,7 @@ try {
 
             background:
               
-                url("../assets/images/patterns.png");
+                url("../assets/images/pattern3.png");
 
             background-size: cover;
             background-position: center;
@@ -195,9 +195,9 @@ try {
            ========================================= */
 
         .admin-header {
-            width: 100%;
+           width: 100%;
 
-            height: 80px;
+            height: 95px;
 
             display: flex;
             align-items: center;
