@@ -2235,58 +2235,135 @@ img {
     color: #b8862c;
 }
 
-
 /* =========================================
-   CUSTOMER DROPDOWN MENU
+   CUSTOMER ACCOUNT DROPDOWN
 ========================================= */
 
 .customer-menu {
     position: relative;
-    display: inline-block;
 }
 
 
+/* =========================================
+   ACCOUNT BUTTON
+========================================= */
+
 .customer-menu-btn {
-    background: fixed;
-
-    color: #ffffff;
-
-    padding: 16px 24px;
-
-    border: 2px solid #b8862c;
-
-    border-radius: 12px;
-
-    font-size: 16px;
-
-    font-weight: 600;
-
-    cursor: pointer;
 
     display: flex;
 
     align-items: center;
 
-    gap: 8px;
+    gap: 12px;
 
-    transition: 0.3s ease;
+    min-width: 100px;
+    height: 50px;
+
+    padding: 10px 10px;
+
+    border: 1.5px solid #c8942f;
+
+    border-radius: 15px;
+
+    background: #0e1423;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 
 .customer-menu-btn:hover {
-    opacity: 0.9;
 
-    transform: translateY(-2px);
+    background: #151d2f;
+
+    border-color: #d9a238;
+
+    box-shadow:
+        0 5px 18px
+        rgba(200, 148, 47, 0.12);
+}
+
+
+/* =========================================
+   TOP AVATAR
+========================================= */
+
+.customer-avatar {
+
+    width: 20px;
+
+    height: 20px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #c8942f;
+
+    color: #171b26;
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+
+.customer-menu-name {
+
+    flex: 1;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 
 .dropdown-arrow {
-    font-size: 10px;
+
+    color: #ffffff;
+
+    font-size: 11px;
+
+    transition:
+        transform 0.25s ease;
 }
 
 
+.customer-menu:has(
+    .customer-dropdown.show
+) .dropdown-arrow {
+
+    transform: rotate(180deg);
+}
+
+
+/* =========================================
+   DROPDOWN
+========================================= */
+
 .customer-dropdown {
-    display: none;
 
     position: absolute;
 
@@ -2294,33 +2371,192 @@ img {
 
     right: 0;
 
-    min-width: 210px;
+    width: 280px;
+
+    padding: 8px;
+
+    border: 1px solid
+        rgba(200, 148, 47, 0.65);
+
+    border-radius: 15px;
 
     background: #151c2d;
 
-    border: 2px solid #b8862c;
+    box-shadow:
+        0 18px 45px
+        rgba(0, 0, 0, 0.42);
 
-    border-radius: 10px;
+    opacity: 0;
 
-    overflow: hidden;
+    visibility: hidden;
+
+    transform:
+        translateY(-8px);
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease,
+        transform 0.2s ease;
 
     z-index: 9999;
-
-    box-shadow:
-        0 10px 30px
-        rgba(0, 0, 0, 0.35);
 }
 
 
 .customer-dropdown.show {
-    display: block;
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translateY(0);
 }
 
 
-.customer-dropdown a {
-    display: block;
+/* =========================================
+   PROFILE CARD
+========================================= */
 
-    padding: 14px 18px;
+.customer-profile-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease;
+}
+
+
+.customer-profile-card:hover {
+
+    background:
+        rgba(255, 255, 255, 0.05);
+}
+
+
+/* =========================================
+   PROFILE AVATAR
+========================================= */
+
+.profile-avatar {
+
+    width: 39px;
+
+    height: 40px;
+
+    min-width: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #c8942f;
+
+    color: #171b26;
+
+    font-size: 19px;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 4px 12px
+        rgba(200, 148, 47, 0.18);
+}
+
+
+/* =========================================
+   PROFILE DETAILS
+========================================= */
+
+.profile-details {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.profile-details strong {
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.profile-details small {
+
+    max-width: 185px;
+
+    color: #8f9aae;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================
+   DIVIDER
+========================================= */
+
+.dropdown-divider {
+
+    height: 1px;
+
+    margin: 7px 5px;
+
+    background:
+        rgba(255, 255, 255, 0.10);
+}
+
+
+/* =========================================
+   DROPDOWN LINKS
+========================================= */
+
+.customer-dropdown-link {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 13px;
+
+    border-radius: 9px;
 
     color: #ffffff;
 
@@ -2328,51 +2564,113 @@ img {
 
     font-size: 14px;
 
-    transition: 0.3s ease;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 
-.customer-dropdown a:hover {
-    background: #1c2538;
+.customer-dropdown-link:hover {
 
-    color: #e5b94e;
+    background:
+        rgba(200, 148, 47, 0.10);
+
+    color: #dca63b;
+
+    transform:
+        translateX(2px);
 }
 
-
-.dropdown-divider {
-    height: 1px;
-
-    background: rgba(255, 255, 255, 0.15);
-}
-
-
-.logout-link {
-    color: #e5b94e !important;
-}
 
 /* =========================================
-   CUSTOMER PROFILE
+   ICON
 ========================================= */
 
-.profile-member-info {
-    margin: 20px 0;
+.dropdown-icon {
 
-    padding: 15px;
+    width: 24px;
 
-    background: #0e1423;
+    text-align: center;
 
-    border-left: 3px solid #b8862c;
+    font-size: 17px;
 
-    color: #bfc3cc;
-
-    font-size: 14px;
+    flex-shrink: 0;
 }
 
 
-.profile-member-info strong {
-    color: #e5b94e;
+/* =========================================
+   LOGOUT
+========================================= */
 
-    margin-left: 5px;
+.customer-dropdown .logout-link {
+
+    color: #e4a4a4;
+}
+
+
+.customer-dropdown .logout-link:hover {
+
+    color: #ff8b8b;
+
+    background:
+        rgba(255, 80, 80, 0.08);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .customer-menu-btn {
+
+        min-width: auto;
+
+        padding: 10px 12px;
+    }
+
+
+    .customer-menu-name {
+
+        max-width: 110px;
+    }
+
+
+    .customer-dropdown {
+
+        right: 0;
+
+        width: 270px;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .customer-menu-name {
+
+        display: none;
+    }
+
+
+    .customer-menu-btn {
+
+        min-width: 48px;
+
+        justify-content: center;
+    }
+
+
+    .customer-dropdown {
+
+        width: 260px;
+    }
+
 }
 
 
@@ -3023,6 +3321,7 @@ img {
 
     justify-content: center;
 
+    background: #ffffff;
 }
 
 

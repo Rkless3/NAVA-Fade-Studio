@@ -5,7 +5,6 @@ session_start();
 require_once "config/Database.php";
 require_once "classes/Customer.php";
 
-
 $database = new Database();
 $db = $database->connect();
 
@@ -14,27 +13,121 @@ $customer = new Customer($db);
 $error = "";
 
 
+/* =====================================================
+   IF ALREADY LOGGED IN
+===================================================== */
+
+if (
+    isset($_SESSION["admin_logged_in"]) &&
+    $_SESSION["admin_logged_in"] === true
+) {
+    header("Location: admin/dashboard.php");
+    exit;
+}
+
+if (isset($_SESSION["customer_id"])) {
+    header("Location: index.php");
+    exit;
+}
+
+
+/* =====================================================
+   LOGIN PROCESS
+===================================================== */
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $email = trim($_POST["email"] ?? "");
+    $identifier = trim($_POST["identifier"] ?? "");
     $password = $_POST["password"] ?? "";
 
 
-    if (empty($email) || empty($password)) {
+    /* ================================================
+       VALIDATION
+    ================================================ */
 
-        $error = "Please enter your email and password.";
+    if ($identifier === "" || $password === "") {
+
+        $error = "Please enter your username/email and password.";
 
     } else {
 
+        /* ================================================
+           ADMIN LOGIN
+           
+           Uses your existing administrator credentials.
+        ================================================ */
+
+        $adminUsername = "Archilles";
+
+        /*
+         * Keep the same administrator password
+         * you were previously using in admin/login.php.
+         */
+        $adminPassword = "030305";
+
+
+        if (
+            $identifier === $adminUsername &&
+            $password === $adminPassword
+        ) {
+
+            /*
+             * Prevent session mixing between
+             * administrator and customer.
+             */
+            unset(
+                $_SESSION["customer_id"],
+                $_SESSION["customer_name"],
+                $_SESSION["customer_email"]
+            );
+
+
+            /*
+             * Regenerate session ID after login.
+             */
+            session_regenerate_id(true);
+
+
+            $_SESSION["admin_logged_in"] = true;
+            $_SESSION["admin_username"] = $adminUsername;
+
+
+            header("Location: admin/dashboard.php");
+            exit;
+        }
+
+
+        /* ================================================
+           CUSTOMER LOGIN
+        ================================================ */
+
         $logged_customer = $customer->login(
-            $email,
+            $identifier,
             $password
         );
 
 
         if ($logged_customer) {
 
-            // Store customer information in session
+            /*
+             * Prevent session mixing between
+             * customer and administrator.
+             */
+            unset(
+                $_SESSION["admin_logged_in"],
+                $_SESSION["admin_username"]
+            );
+
+
+            /*
+             * Regenerate session ID after login.
+             */
+            session_regenerate_id(true);
+
+
+            /*
+             * Store customer information.
+             */
             $_SESSION["customer_id"] =
                 $logged_customer["id"];
 
@@ -45,20 +138,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $logged_customer["email"];
 
 
-            // Redirect after successful login
             header("Location: index.php");
-            exit();
-
-        } else {
-
-            $error = "Invalid email or password.";
-
+            exit;
         }
+
+
+        /*
+         * If neither admin nor customer login
+         * succeeded.
+         */
+        $error = "Invalid username/email or password.";
     }
 }
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -72,24 +165,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Login | NAVA Fade Studio</title>
-
-
-    <!-- =========================================
-         FONT AWESOME
-    ========================================== -->
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    >
+    <title>
+        Login | NAVA Fade Studio
+    </title>
 
 
     <style>
-
-        /* =========================================
-           RESET
-        ========================================= */
 
         * {
             box-sizing: border-box;
@@ -97,10 +178,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             padding: 0;
         }
 
-
-        /* =========================================
-           PAGE
-        ========================================= */
 
         body {
 
@@ -112,7 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             justify-content: center;
 
-            padding: 30px 20px;
+            padding: 30px 15px;
 
             font-family:
                 Bahnschrift,
@@ -120,10 +197,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 Arial,
                 sans-serif;
 
-            background-image:
+            background:
                 linear-gradient(
-                    rgba(7, 14, 29, 0.30),
-                    rgba(7, 14, 29, 0.30)
+                    rgba(14, 20, 35, 0.90),
+                    rgba(14, 20, 35, 0.90)
                 ),
                 url("assets/images/pattern2.png");
 
@@ -131,18 +208,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             background-position: center;
 
-            background-repeat: no-repeat;
-
-            background-attachment: fixed;
-
             color: white;
-
         }
 
 
-        /* =========================================
+        /* =====================================================
            LOGIN CONTAINER
-        ========================================= */
+        ===================================================== */
 
         .login-container {
 
@@ -154,26 +226,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             background: #0e1423;
 
-            border: 3px solid #b8862c;
+            border:
+                2px solid #b8862c;
 
             border-radius: 25px;
 
             box-shadow:
-                0 15px 40px
+                0 20px 50px
                 rgba(0, 0, 0, 0.45);
 
             text-align: center;
-
         }
 
 
-        /* =========================================
+        /* =====================================================
            LOGO
-        ========================================= */
+        ===================================================== */
 
         .login-logo {
 
-            width: 300px;
+            width: 270px;
 
             max-width: 100%;
 
@@ -181,61 +253,87 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             display: block;
 
-            margin: 0 auto 30px;
-
+            margin:
+                0 auto 25px;
         }
 
 
-        /* =========================================
-           WELCOME TITLE
-        ========================================= */
+        /* =====================================================
+           HEADER
+        ===================================================== */
 
-        .login-container h1 {
+        .login-header {
+
+            margin-bottom: 30px;
+        }
+
+
+        .login-header h1 {
 
             margin-bottom: 8px;
 
+            color: #ffffff;
+
             font-size: 32px;
 
-            color: #b8862c;
-
-            font-weight: 700;
-
+            font-weight: 800;
         }
 
 
-        /* =========================================
-           SUBTITLE
-        ========================================= */
+        .login-header h1 span {
 
-        .login-container .subtitle {
+            color: #b8862c;
+        }
 
-            margin-bottom: 30px;
 
-            color: #ddd;
+        .login-header p {
+
+            color: #aaa;
 
             font-size: 15px;
 
             line-height: 1.5;
-
         }
 
 
-        /* =========================================
-           FORM GROUP
-        ========================================= */
+        /* =====================================================
+           ERROR MESSAGE
+        ===================================================== */
+
+        .error-message {
+
+            margin-bottom: 20px;
+
+            padding: 12px 15px;
+
+            border-radius: 8px;
+
+            background:
+                rgba(139, 32, 32, 0.95);
+
+            border:
+                1px solid
+                rgba(255, 100, 100, 0.4);
+
+            color: #ffffff;
+
+            font-size: 14px;
+
+            line-height: 1.4;
+        }
+
+
+        /* =====================================================
+           FORM
+        ===================================================== */
 
         .form-group {
 
             text-align: left;
 
             margin-bottom: 20px;
-
         }
 
-
-        /* =========================================
-           LABEL
-        ========================================= */
 
         .form-group label {
 
@@ -243,18 +341,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             margin-bottom: 8px;
 
-            color: #fff;
-
-            font-weight: 600;
+            color: #ffffff;
 
             font-size: 15px;
 
+            font-weight: 600;
         }
 
-
-        /* =========================================
-           INPUT
-        ========================================= */
 
         .form-group input {
 
@@ -262,22 +355,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             padding: 14px 16px;
 
-            border: 2px solid #555;
+            border:
+                2px solid #555;
 
             border-radius: 10px;
 
-            background: #fff;
+            background: #ffffff;
 
-            color: #111;
+            color: #111111;
+
+            font-family: inherit;
 
             font-size: 16px;
 
             outline: none;
 
             transition:
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
-
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
 
@@ -288,33 +383,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             box-shadow:
                 0 0 0 3px
                 rgba(184, 134, 44, 0.15);
-
         }
 
 
-        /* =========================================
-           PASSWORD WRAPPER
-        ========================================= */
+        /* =====================================================
+           PASSWORD
+        ===================================================== */
 
         .password-wrapper {
 
             position: relative;
-
         }
 
 
         .password-wrapper input {
 
-            width: 100%;
-
             padding-right: 50px;
-
         }
 
-
-        /* =========================================
-           PASSWORD TOGGLE
-        ========================================= */
 
         .toggle-password {
 
@@ -324,63 +410,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             top: 50%;
 
-            transform: translateY(-50%);
-
-            width: 34px;
-
-            height: 34px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
+            transform:
+                translateY(-50%);
 
             background: transparent;
 
             border: none;
 
-            border-radius: 50%;
-
             cursor: pointer;
 
-            color: #0e1423;
+            padding: 5px;
 
-            font-size: 17px;
+            color: #555;
 
-            padding: 0;
-
-            transition:
-                color 0.2s ease,
-                background-color 0.2s ease;
-
+            font-size: 18px;
         }
 
 
         .toggle-password:hover {
 
-            color: #d4a33a;
-
-            background-color:
-                rgba(184, 134, 44, 0.10);
-
+            color: #b8862c;
         }
 
 
-        .toggle-password:focus {
-
-            outline: none;
-
-            box-shadow:
-                0 0 0 2px
-                rgba(184, 134, 44, 0.25);
-
-        }
-
-
-        /* =========================================
+        /* =====================================================
            LOGIN BUTTON
-        ========================================= */
+        ===================================================== */
 
         .login-btn {
 
@@ -398,16 +453,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             color: #0e1423;
 
+            font-family: inherit;
+
             font-size: 17px;
 
-            font-weight: bold;
+            font-weight: 800;
 
             cursor: pointer;
 
             transition:
                 background-color 0.3s ease,
-                transform 0.3s ease;
-
+                transform 0.3s ease,
+                box-shadow 0.3s ease;
         }
 
 
@@ -415,81 +472,88 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             background: #d4a33a;
 
-            transform: translateY(-2px);
+            transform:
+                translateY(-2px);
 
+            box-shadow:
+                0 8px 20px
+                rgba(184, 134, 44, 0.25);
         }
 
 
-        /* =========================================
-           ERROR MESSAGE
-        ========================================= */
+        /* =====================================================
+           REGISTER / HOME LINKS
+        ===================================================== */
 
-        .error-message {
+        .login-links {
 
-            margin-bottom: 20px;
+            margin-top: 25px;
 
-            padding: 12px;
-
-            border-radius: 8px;
-
-            background: #8b2020;
-
-            color: white;
-
-            font-size: 14px;
-
-            line-height: 1.4;
-
-        }
-
-
-        /* =========================================
-           BOTTOM LINKS
-        ========================================= */
-
-        .booking-back {
-
-            margin-top: 20px;
-
-            color: #fff;
+            color: #ffffff;
 
             font-size: 15px;
 
-            line-height: 1.5;
-
+            line-height: 1.6;
         }
 
 
-        .booking-back a {
+        .login-links a {
 
             color: #b8862c;
 
             text-decoration: none;
 
             font-weight: 600;
-
         }
 
 
-        .booking-back a:hover {
+        .login-links a:hover {
 
             color: #d4a33a;
 
             text-decoration: underline;
-
         }
 
 
-        /* =========================================
+        .back-home {
+
+            display: inline-block;
+
+            margin-top: 18px;
+        }
+
+
+        /* =====================================================
+           LOGIN NOTE
+        ===================================================== */
+
+        .login-note {
+
+            margin-top: 25px;
+
+            padding-top: 18px;
+
+            border-top:
+                1px solid
+                rgba(255, 255, 255, 0.10);
+
+            color: #777;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
            RESPONSIVE
-        ========================================= */
+        ===================================================== */
 
         @media (max-width: 600px) {
 
             body {
 
                 padding: 20px 15px;
-
             }
 
 
@@ -498,32 +562,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 padding: 35px 25px;
 
                 border-radius: 20px;
-
             }
 
 
             .login-logo {
 
-                width: 250px;
+                width: 240px;
 
-                margin-bottom: 25px;
-
+                margin-bottom: 20px;
             }
 
 
-            .login-container h1 {
+            .login-header h1 {
 
                 font-size: 28px;
-
             }
 
 
-            .login-container .subtitle {
+            .login-header p {
 
                 font-size: 14px;
-
             }
-
         }
 
 
@@ -532,21 +591,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             .login-container {
 
                 padding: 30px 20px;
-
             }
 
 
             .login-logo {
 
                 width: 220px;
-
             }
 
 
-            .login-container h1 {
+            .login-header h1 {
 
                 font-size: 25px;
-
             }
 
 
@@ -555,7 +611,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 padding: 13px 14px;
 
                 font-size: 15px;
-
             }
 
 
@@ -564,9 +619,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 padding: 14px;
 
                 font-size: 16px;
-
             }
-
         }
 
     </style>
@@ -577,169 +630,192 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
 
-    <div class="login-container">
+<div class="login-container">
 
 
-        <!-- =====================================
-             NAVA LOGO
-        ====================================== -->
+    <!-- =====================================================
+         LOGO
+    ===================================================== -->
 
-        <img
-            src="assets/images/logo.png"
-            alt="NAVA Fade Studio Logo"
-            class="login-logo"
-        >
-
-
-        <!-- =====================================
-             WELCOME
-        ====================================== -->
-
-        <div class="subtitle">
-
-            <h1>Welcome Back</h1>
-
-            <p>
-                Login to your account to book an appointment.
-            </p>
-
-        </div>
+    <img
+        src="assets/images/logo.png"
+        alt="NAVA Fade Studio Logo"
+        class="login-logo"
+    >
 
 
-        <!-- =====================================
-             ERROR MESSAGE
-        ====================================== -->
+    <!-- =====================================================
+         HEADER
+    ===================================================== -->
 
-        <?php if (!empty($error)): ?>
+    <div class="login-header">
 
-            <div class="error-message">
+        <h1>
+            Welcome <span>Back</span>
+        </h1>
 
-                <?= htmlspecialchars($error) ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <!-- =====================================
-             LOGIN FORM
-        ====================================== -->
-
-        <form method="POST" action="">
-
-
-            <!-- EMAIL -->
-
-            <div class="form-group">
-
-                <label for="email">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email address"
-                    value="<?= htmlspecialchars($_POST["email"] ?? "") ?>"
-                    required
-                >
-
-            </div>
-
-
-            <!-- PASSWORD -->
-
-            <div class="form-group">
-
-                <label for="password">
-                    Password
-                </label>
-
-
-                <div class="password-wrapper">
-
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        required
-                    >
-
-
-                    <button
-                        type="button"
-                        class="toggle-password"
-                        data-target="password"
-                        aria-label="Show password"
-                    >
-
-                        <i class="fa-solid fa-eye"></i>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- LOGIN -->
-
-            <button
-                type="submit"
-                class="login-btn"
-            >
-                LOGIN
-            </button>
-
-
-        </form>
-
-
-        <!-- =====================================
-             REGISTER / HOME LINKS
-        ====================================== -->
-
-        <div class="booking-back">
-
-            <p>
-
-                Don't have an account?
-
-                <a href="register.php">
-                    Create one here
-                </a>
-
-            </p>
-
-
-            <br>
-
-
-            <a href="index.php">
-                ← Back to Home
-            </a>
-
-        </div>
-
+        <p>
+            Login to access your NAVA Fade Studio account.
+        </p>
 
     </div>
 
 
-    <!-- =========================================
-         PASSWORD TOGGLE
-    ========================================= -->
+    <!-- =====================================================
+         ERROR
+    ===================================================== -->
 
-    <script>
+    <?php if (!empty($error)): ?>
 
-        const passwordButtons =
-            document.querySelectorAll(".toggle-password");
+        <div class="error-message">
+
+            <?= htmlspecialchars($error) ?>
+
+        </div>
+
+    <?php endif; ?>
 
 
-        passwordButtons.forEach(function(button) {
+    <!-- =====================================================
+         LOGIN FORM
+    ===================================================== -->
 
-            button.addEventListener("click", function() {
+    <form
+        method="POST"
+        action=""
+    >
+
+
+        <!-- USERNAME / EMAIL -->
+
+        <div class="form-group">
+
+            <label for="identifier">
+
+                Email or Username
+
+            </label>
+
+            <input
+                type="text"
+                id="identifier"
+                name="identifier"
+                placeholder="Enter your email or username"
+                value="<?= htmlspecialchars($_POST["identifier"] ?? "") ?>"
+                autocomplete="username"
+                required
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="password">
+
+                Password
+
+            </label>
+
+
+            <div class="password-wrapper">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="password"
+                    aria-label="Show or hide password"
+                >
+                    👁
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <button
+            type="submit"
+            class="login-btn"
+        >
+            LOGIN
+        </button>
+
+
+    </form>
+
+
+    <!-- =====================================================
+         LINKS
+    ===================================================== -->
+
+    <div class="login-links">
+
+        <p>
+
+            Don't have an account?
+
+            <a href="register.php">
+                Create one here
+            </a>
+
+        </p>
+
+
+        <a
+            href="index.php"
+            class="back-home"
+        >
+            ← Back to Home
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         NOTE
+    ===================================================== -->
+
+    <div class="login-note">
+
+        One login page for NAVA Fade Studio
+        administrator and customer accounts.
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     PASSWORD TOGGLE
+===================================================== -->
+
+<script>
+
+    const passwordButtons =
+        document.querySelectorAll(".toggle-password");
+
+
+    passwordButtons.forEach(function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
 
                 const targetId =
                     button.dataset.target;
@@ -747,43 +823,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 const passwordInput =
                     document.getElementById(targetId);
 
-                const icon =
-                    button.querySelector("i");
 
-
-                if (passwordInput.type === "password") {
+                if (
+                    passwordInput.type ===
+                    "password"
+                ) {
 
                     passwordInput.type = "text";
 
-                    icon.classList.remove("fa-eye");
-
-                    icon.classList.add("fa-eye-slash");
-
-                    button.setAttribute(
-                        "aria-label",
-                        "Hide password"
-                    );
+                    button.textContent = "🙈";
 
                 } else {
 
                     passwordInput.type = "password";
 
-                    icon.classList.remove("fa-eye-slash");
-
-                    icon.classList.add("fa-eye");
-
-                    button.setAttribute(
-                        "aria-label",
-                        "Show password"
-                    );
+                    button.textContent = "👁";
 
                 }
 
-            });
+            }
+        );
 
-        });
+    });
 
-    </script>
+</script>
 
 
 </body>

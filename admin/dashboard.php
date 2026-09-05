@@ -13,7 +13,25 @@ if (!isset($_SESSION["admin_logged_in"]) || $_SESSION["admin_logged_in"] !== tru
     exit;
 }
 
+
 require_once "../config/Database.php";
+
+$database = new Database();
+$db = $database->connect();
+
+$adminUsername = $_SESSION["admin_username"] ?? "Admin";
+
+/* =========================================
+   DASHBOARD STATISTICS
+========================================= */
+
+$reviewStmt = $db->query("
+    SELECT COUNT(*) AS total_reviews
+    FROM reviews
+");
+
+$totalReviews = (int) $reviewStmt->fetch()["total_reviews"];
+
 
 /*
 |--------------------------------------------------------------------------
@@ -509,10 +527,7 @@ try {
 
         </span>
 
-        <a
-            href="logout.php"
-            class="logout-btn"
-        >
+        <a href="../logout.php" class="logout-btn">
             Logout
         </a>
 
@@ -634,7 +649,7 @@ try {
                 </h3>
 
                 <div class="number">
-                    0
+                    <?= $totalReviews ?>
                 </div>
 
             </div>

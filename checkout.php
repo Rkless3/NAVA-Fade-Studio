@@ -2,18 +2,19 @@
 
 session_start();
 
-
 /* =========================================
    LOGIN REQUIREMENT
 ========================================= */
 
 if (!isset($_SESSION["customer_id"])) {
-
     header("Location: login.php");
     exit;
-
 }
 
+
+/* =========================================
+   REQUIRE FILES
+========================================= */
 
 require_once "config/Database.php";
 require_once "classes/Product.php";
@@ -69,7 +70,6 @@ if (!$customer) {
 
     header("Location: login.php");
     exit;
-
 }
 
 
@@ -88,7 +88,6 @@ if (empty($cart)) {
 
     header("Location: cart.php");
     exit;
-
 }
 
 
@@ -107,10 +106,14 @@ foreach ($cart as $product_id => $quantity) {
     $quantity = (int) $quantity;
 
 
+    /* INVALID QUANTITY */
+
     if ($quantity <= 0) {
         continue;
     }
 
+
+    /* GET PRODUCT */
 
     $product = $productModel->getById($product_id);
 
@@ -141,7 +144,6 @@ foreach ($cart as $product_id => $quantity) {
     if ($quantity > (int) $product["stock"]) {
 
         $quantity = (int) $product["stock"];
-
     }
 
 
@@ -150,12 +152,16 @@ foreach ($cart as $product_id => $quantity) {
     }
 
 
+    /* PRICE */
+
     $price = (float) $product["price"];
 
     $subtotal = $price * $quantity;
 
     $total += $subtotal;
 
+
+    /* ADD TO ORDER ITEMS */
 
     $orderItems[] = [
 
@@ -170,7 +176,6 @@ foreach ($cart as $product_id => $quantity) {
         "product_name" => $product["product_name"]
 
     ];
-
 }
 
 
@@ -184,7 +189,6 @@ if (empty($orderItems)) {
 
     header("Location: cart.php");
     exit;
-
 }
 
 
@@ -205,10 +209,11 @@ $errorMessage = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-
     try {
 
-        /* START TRANSACTION */
+        /* =====================================
+           START TRANSACTION
+        ===================================== */
 
         $db->beginTransaction();
 
@@ -232,7 +237,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             )
         ";
 
-
         $orderStmt = $db->prepare($orderQuery);
 
 
@@ -252,13 +256,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $orderStmt->execute();
 
 
-        /* GET ORDER ID */
+        /* =====================================
+           GET ORDER ID
+        ===================================== */
 
         $order_id = (int) $db->lastInsertId();
 
 
         /* =====================================
-           INSERT ORDER ITEMS
+           PREPARE ORDER ITEM QUERY
         ===================================== */
 
         $itemQuery = "
@@ -280,12 +286,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             )
         ";
 
-
         $itemStmt = $db->prepare($itemQuery);
 
 
         /* =====================================
-           UPDATE PRODUCT STOCK
+           STOCK UPDATE QUERY
         ===================================== */
 
         $stockQuery = "
@@ -295,14 +300,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             AND stock >= :quantity
         ";
 
-
         $stockStmt = $db->prepare($stockQuery);
 
+
+        /* =====================================
+           PROCESS EACH ORDER ITEM
+        ===================================== */
 
         foreach ($orderItems as $item) {
 
 
-            /* INSERT ORDER ITEM */
+            /* =================================
+               INSERT ORDER ITEM
+            ================================= */
 
             $itemStmt->bindValue(
                 ":order_id",
@@ -340,7 +350,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $itemStmt->execute();
 
 
-            /* REDUCE PRODUCT STOCK */
+            /* =================================
+               REDUCE PRODUCT STOCK
+            ================================= */
 
             $stockStmt->bindValue(
                 ":quantity",
@@ -359,7 +371,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $stockStmt->execute();
 
 
-            /* CHECK STOCK UPDATE */
+            /* =================================
+               CHECK STOCK UPDATE
+            ================================= */
 
             if ($stockStmt->rowCount() === 0) {
 
@@ -367,9 +381,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     "Not enough stock available for " .
                     $item["product_name"]
                 );
-
             }
-
         }
 
 
@@ -380,10 +392,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $db->commit();
 
 
-        /* CLEAR CART */
+        /* =====================================
+           CLEAR CART
+        ===================================== */
 
         $_SESSION["cart"] = [];
 
+
+        /* =====================================
+           SUCCESS
+        ===================================== */
 
         $orderSuccess = true;
 
@@ -391,26 +409,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } catch (Exception $e) {
 
 
-        /* ROLLBACK IF SOMETHING FAILED */
+        /* =====================================
+           ROLLBACK
+        ===================================== */
 
         if ($db->inTransaction()) {
-
             $db->rollBack();
-
         }
 
 
         $errorMessage = $e->getMessage();
-
     }
-
 }
 
 ?>
 
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -439,73 +454,118 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
            CHECKOUT PAGE
         ===================================================== */
 
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: Bahnschrift, "Segoe UI", Arial, sans-serif;
+            background: #0b1020;
+        }
+
+
         .checkout-page {
 
             min-height: 100vh;
 
-            padding: 70px 8%;
+            padding: 70px 7% 90px;
 
             background:
-                url("assets/images/pattern2.png")
+                linear-gradient(
+                    rgba(7, 12, 25, 0.88),
+                    rgba(7, 12, 25, 0.92)
+                ),
+                url("assets/images/pattern3.png")
                 center center / cover fixed;
 
             color: #ffffff;
-
         }
 
 
         /* =====================================================
-           CHECKOUT HEADER
+           CHECKOUT HERO
         ===================================================== */
 
-        .checkout-page-header {
+        .checkout-hero {
+
+            max-width: 1100px;
+
+            margin: 0 auto 55px;
 
             text-align: center;
-
-            margin-bottom: 50px;
-
         }
 
 
-        .checkout-page-header span {
+        .checkout-logo {
+
+            width: 150px;
+
+            height: auto;
 
             display: block;
 
-            color: #b8862c;
-
-            font-size: 14px;
-
-            font-weight: bold;
-
-            letter-spacing: 4px;
-
-            margin-bottom: 10px;
-
+            margin: 0 auto 25px;
         }
 
 
-        .checkout-page-header h1 {
+        .checkout-eyebrow {
+
+            display: inline-block;
+
+            margin-bottom: 12px;
+
+            color: #d4a33a;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            letter-spacing: 5px;
+
+            text-transform: uppercase;
+        }
+
+
+        .checkout-hero h1 {
 
             margin: 0;
 
-            font-size: 42px;
+            font-size: clamp(42px, 5vw, 68px);
 
-            font-weight: bold;
+            line-height: 1.05;
 
+            font-weight: 800;
+
+            letter-spacing: -1px;
+
+            text-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
         }
 
 
-        .checkout-page-header p {
+        .checkout-hero h1 span {
 
-            margin-top: 12px;
+            color: #d4a33a;
+        }
 
-            color: #aaaaaa;
 
+        .checkout-hero p {
+
+            max-width: 650px;
+
+            margin: 18px auto 0;
+
+            color: #c7ccda;
+
+            font-size: 16px;
+
+            line-height: 1.6;
         }
 
 
         /* =====================================================
-           CHECKOUT CONTAINER
+           MAIN CHECKOUT CONTAINER
         ===================================================== */
 
         .checkout-container {
@@ -520,6 +580,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             gap: 25px;
 
+            align-items: stretch;
         }
 
 
@@ -529,27 +590,75 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         .checkout-box {
 
-            background: #0e1423;
+            position: relative;
 
-            border: 1px solid #555;
+            background: rgba(14, 20, 35, 0.96);
 
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
 
-            padding: 30px;
+            border-radius: 18px;
 
-            box-sizing: border-box;
+            padding: 32px;
 
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.28);
+
+            overflow: hidden;
+        }
+
+
+        .checkout-box::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 3px;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #b8862c,
+                #e0b13d,
+                #b8862c,
+                transparent
+            );
         }
 
 
         .checkout-box h2 {
 
-            margin: 0 0 25px;
+            margin: 0 0 28px;
 
             color: #ffffff;
 
-            font-size: 24px;
+            font-size: 25px;
 
+            font-weight: 800;
+        }
+
+
+        .checkout-box h2::after {
+
+            content: "";
+
+            display: block;
+
+            width: 45px;
+
+            height: 3px;
+
+            margin-top: 10px;
+
+            background: #b8862c;
+
+            border-radius: 5px;
         }
 
 
@@ -557,19 +666,65 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
            CUSTOMER INFORMATION
         ===================================================== */
 
+        .customer-info {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
         .customer-info-row {
 
-            padding: 15px 0;
+            display: flex;
 
-            border-bottom: 1px solid #333;
+            align-items: flex-start;
 
+            gap: 16px;
+
+            padding: 18px 0;
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
         }
 
 
         .customer-info-row:last-child {
 
             border-bottom: none;
+        }
 
+
+        .customer-info-icon {
+
+            width: 40px;
+
+            height: 40px;
+
+            min-width: 40px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: rgba(184, 134, 44, 0.12);
+
+            border: 1px solid rgba(184, 134, 44, 0.35);
+
+            color: #d4a33a;
+
+            font-size: 17px;
+        }
+
+
+        .customer-info-content {
+
+            flex: 1;
+
+            min-width: 0;
         }
 
 
@@ -579,19 +734,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             margin-bottom: 5px;
 
-            color: #aaaaaa;
+            color: #8f97a9;
 
-            font-size: 13px;
+            font-size: 12px;
 
+            font-weight: 600;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
         }
 
 
         .customer-info-value {
 
+            display: block;
+
             color: #ffffff;
 
             font-size: 16px;
 
+            font-weight: 600;
+
+            word-break: break-word;
         }
 
 
@@ -599,20 +764,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
            ORDER ITEMS
         ===================================================== */
 
+        .checkout-products {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
         .checkout-product {
 
             display: flex;
 
-            justify-content: space-between;
-
             align-items: center;
+
+            justify-content: space-between;
 
             gap: 20px;
 
             padding: 18px 0;
 
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        }
 
+
+        .checkout-product:last-child {
+
+            border-bottom: none;
         }
 
 
@@ -620,6 +798,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             flex: 1;
 
+            min-width: 0;
         }
 
 
@@ -631,17 +810,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             font-size: 17px;
 
+            font-weight: 700;
         }
 
 
-        .checkout-product-info p {
+        .checkout-product-details {
 
-            margin: 4px 0;
+            display: flex;
 
-            color: #aaaaaa;
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+        }
+
+
+        .checkout-product-details span {
+
+            color: #9ca4b5;
 
             font-size: 13px;
+        }
 
+
+        .checkout-product-details .quantity {
+
+            padding: 4px 9px;
+
+            background: #151d30;
+
+            border: 1px solid #29334a;
+
+            border-radius: 6px;
+
+            color: #d5dae5;
+
+            font-weight: 600;
         }
 
 
@@ -649,12 +854,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             color: #f0b429;
 
-            font-size: 17px;
+            font-size: 18px;
 
-            font-weight: bold;
+            font-weight: 800;
 
             white-space: nowrap;
-
         }
 
 
@@ -666,41 +870,96 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             display: flex;
 
-            justify-content: space-between;
-
             align-items: center;
 
-            margin-top: 25px;
+            justify-content: space-between;
 
-            padding-top: 20px;
+            gap: 20px;
 
-            border-top: 1px solid #555;
+            margin-top: 20px;
 
+            padding-top: 22px;
+
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
         }
 
 
-        .checkout-total span:first-child {
+        .checkout-total-label {
 
-            color: #cccccc;
+            color: #cbd0da;
 
-            font-size: 17px;
+            font-size: 16px;
 
+            font-weight: 600;
         }
 
 
-        .checkout-total span:last-child {
+        .checkout-total-amount {
 
             color: #f0b429;
 
-            font-size: 28px;
+            font-size: 32px;
 
-            font-weight: bold;
+            font-weight: 800;
 
+            white-space: nowrap;
         }
 
 
         /* =====================================================
-           BUTTONS
+           ORDER NOTICE
+        ===================================================== */
+
+        .checkout-notice {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 12px;
+
+            margin-top: 22px;
+
+            padding: 14px 16px;
+
+            background: rgba(184, 134, 44, 0.08);
+
+            border: 1px solid rgba(184, 134, 44, 0.22);
+
+            border-radius: 10px;
+        }
+
+
+        .checkout-notice-icon {
+
+            color: #d4a33a;
+
+            font-size: 17px;
+
+            line-height: 1.4;
+        }
+
+
+        .checkout-notice p {
+
+            margin: 0;
+
+            color: #aeb5c3;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        .checkout-notice strong {
+
+            color: #d4a33a;
+        }
+
+
+        /* =====================================================
+           ACTION BUTTONS
         ===================================================== */
 
         .checkout-actions {
@@ -713,72 +972,96 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             justify-content: flex-end;
 
-            gap: 15px;
+            align-items: center;
 
+            gap: 14px;
+        }
+
+
+        .checkout-back,
+        .checkout-place-btn {
+
+            min-height: 48px;
+
+            padding: 13px 25px;
+
+            border-radius: 9px;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            text-decoration: none;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
 
         .checkout-back {
 
-            display: inline-block;
+            display: inline-flex;
 
-            padding: 13px 24px;
+            align-items: center;
 
-            background: #151c2d;
+            justify-content: center;
 
-            border: 1px solid #555;
+            background: rgba(14, 20, 35, 0.95);
 
-            border-radius: 8px;
+            border: 1px solid #354057;
 
             color: #ffffff;
-
-            text-decoration: none;
-
-            font-size: 14px;
-
-            font-weight: bold;
-
-            transition: 0.2s;
-
         }
 
 
         .checkout-back:hover {
 
+            transform: translateY(-2px);
+
             border-color: #b8862c;
 
-            color: #b8862c;
-
+            color: #d4a33a;
         }
 
 
         .checkout-place-btn {
 
-            padding: 13px 24px;
-
-            background: #b8862c;
+            min-width: 150px;
 
             border: none;
 
-            border-radius: 8px;
+            background: linear-gradient(
+                135deg,
+                #b8862c,
+                #d4a33a
+            );
 
             color: #0e1423;
 
-            font-size: 14px;
-
-            font-weight: bold;
-
             cursor: pointer;
 
-            transition: 0.2s;
-
+            box-shadow:
+                0 8px 20px rgba(184, 134, 44, 0.18);
         }
 
 
         .checkout-place-btn:hover {
 
-            background: #d4a33a;
+            transform: translateY(-2px);
 
+            background: linear-gradient(
+                135deg,
+                #d4a33a,
+                #e5b94e
+            );
+
+            box-shadow:
+                0 10px 25px rgba(184, 134, 44, 0.28);
         }
 
 
@@ -794,30 +1077,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             padding: 18px 22px;
 
-            background: #2a1515;
+            background: rgba(100, 25, 25, 0.75);
 
-            border: 1px solid #8b3a3a;
+            border: 1px solid rgba(220, 80, 80, 0.45);
 
-            border-radius: 10px;
+            border-radius: 12px;
 
-            box-sizing: border-box;
-
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.18);
         }
 
 
         .checkout-error strong {
 
-            color: #ffffff;
+            display: block;
 
+            margin-bottom: 6px;
+
+            color: #ff8d8d;
+
+            font-size: 15px;
         }
 
 
         .checkout-error p {
 
-            margin: 8px 0 0;
+            margin: 0;
 
-            color: #dddddd;
+            color: #e8dada;
 
+            font-size: 14px;
+
+            line-height: 1.5;
         }
 
 
@@ -829,107 +1120,215 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             max-width: 650px;
 
-            margin: 50px auto;
+            margin: 30px auto 0;
 
-            padding: 45px;
+            padding: 50px 45px;
 
             text-align: center;
 
-            background: #0e1423;
+            background: rgba(14, 20, 35, 0.97);
 
             border: 1px solid #b8862c;
 
-            border-radius: 15px;
+            border-radius: 20px;
 
-            box-sizing: border-box;
+            box-shadow:
+                0 20px 55px rgba(0, 0, 0, 0.35);
+        }
 
+
+        .success-logo {
+
+            width: 145px;
+
+            height: auto;
+
+            margin: 0 auto 25px;
         }
 
 
         .checkout-success-icon {
 
-            font-size: 50px;
+            width: 72px;
 
-            margin-bottom: 15px;
+            height: 72px;
 
+            margin: 0 auto 22px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: rgba(184, 134, 44, 0.12);
+
+            border: 2px solid #b8862c;
+
+            color: #d4a33a;
+
+            font-size: 36px;
+
+            font-weight: 800;
+        }
+
+
+        .checkout-success .success-label {
+
+            display: block;
+
+            margin-bottom: 10px;
+
+            color: #d4a33a;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 4px;
+
+            text-transform: uppercase;
         }
 
 
         .checkout-success h2 {
 
-            margin: 0 0 15px;
+            margin: 0 0 20px;
 
             color: #ffffff;
 
-            font-size: 30px;
+            font-size: 31px;
 
+            font-weight: 800;
         }
 
 
         .checkout-success p {
 
-            color: #cccccc;
+            margin: 9px 0;
+
+            color: #bfc5d1;
+
+            font-size: 15px;
 
             line-height: 1.6;
-
         }
 
 
         .checkout-success strong {
 
             color: #f0b429;
+        }
 
+
+        .success-order-details {
+
+            margin: 25px 0;
+
+            padding: 20px;
+
+            background: #11182a;
+
+            border: 1px solid #283249;
+
+            border-radius: 12px;
+        }
+
+
+        .success-detail {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 10px 0;
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+
+        .success-detail:last-child {
+
+            border-bottom: none;
+        }
+
+
+        .success-detail span:first-child {
+
+            color: #8f97a9;
+
+            font-size: 13px;
+        }
+
+
+        .success-detail span:last-child {
+
+            color: #ffffff;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            text-align: right;
         }
 
 
         .checkout-success-btn {
 
-            display: inline-block;
+            display: inline-flex;
 
-            margin-top: 20px;
+            align-items: center;
 
-            padding: 13px 24px;
+            justify-content: center;
 
-            background: #b8862c;
+            margin-top: 15px;
+
+            padding: 14px 28px;
+
+            background: linear-gradient(
+                135deg,
+                #b8862c,
+                #d4a33a
+            );
 
             color: #0e1423;
 
-            border-radius: 8px;
+            border-radius: 9px;
 
             text-decoration: none;
 
-            font-weight: bold;
-
             font-size: 14px;
 
-            transition: 0.2s;
+            font-weight: 800;
 
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
 
         .checkout-success-btn:hover {
 
-            background: #d4a33a;
+            transform: translateY(-2px);
 
+            box-shadow:
+                0 10px 25px rgba(184, 134, 44, 0.25);
         }
 
 
         /* =====================================================
-           RESPONSIVE
+           TABLET
         ===================================================== */
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
 
             .checkout-page {
 
-                padding: 50px 20px;
-
-            }
-
-
-            .checkout-page-header h1 {
-
-                font-size: 32px;
+                padding: 60px 5% 80px;
 
             }
 
@@ -941,9 +1340,175 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
 
+            .checkout-hero {
+
+                margin-bottom: 40px;
+
+            }
+
+
+            .checkout-logo {
+
+                width: 135px;
+
+            }
+
+
+            .checkout-hero h1 {
+
+                font-size: 50px;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .checkout-page {
+
+                padding: 45px 18px 60px;
+
+                background-attachment: scroll;
+
+            }
+
+
+            .checkout-hero {
+
+                margin-bottom: 32px;
+
+            }
+
+
+            .checkout-logo {
+
+                width: 120px;
+
+                margin-bottom: 20px;
+
+            }
+
+
+            .checkout-eyebrow {
+
+                font-size: 11px;
+
+                letter-spacing: 3px;
+
+            }
+
+
+            .checkout-hero h1 {
+
+                font-size: 40px;
+
+            }
+
+
+            .checkout-hero p {
+
+                font-size: 14px;
+
+            }
+
+
+            .checkout-box {
+
+                padding: 23px 20px;
+
+                border-radius: 15px;
+
+            }
+
+
+            .checkout-box h2 {
+
+                font-size: 21px;
+
+            }
+
+
+            .customer-info-row {
+
+                gap: 12px;
+
+                padding: 15px 0;
+
+            }
+
+
+            .customer-info-icon {
+
+                width: 36px;
+
+                height: 36px;
+
+                min-width: 36px;
+
+                font-size: 15px;
+
+            }
+
+
+            .customer-info-value {
+
+                font-size: 14px;
+
+            }
+
+
+            .checkout-product {
+
+                gap: 12px;
+
+            }
+
+
+            .checkout-product-info h3 {
+
+                font-size: 15px;
+
+            }
+
+
+            .checkout-product-details {
+
+                gap: 6px;
+
+            }
+
+
+            .checkout-product-details span {
+
+                font-size: 12px;
+
+            }
+
+
+            .checkout-product-subtotal {
+
+                font-size: 15px;
+
+            }
+
+
+            .checkout-total-amount {
+
+                font-size: 25px;
+
+            }
+
+
             .checkout-actions {
 
-                flex-direction: column;
+                flex-direction: column-reverse;
+
+                width: 100%;
 
             }
 
@@ -953,9 +1518,70 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 width: 100%;
 
-                text-align: center;
+            }
 
-                box-sizing: border-box;
+
+            .checkout-success {
+
+                margin-top: 10px;
+
+                padding: 38px 22px;
+
+                border-radius: 16px;
+
+            }
+
+
+            .success-logo {
+
+                width: 120px;
+
+            }
+
+
+            .checkout-success h2 {
+
+                font-size: 25px;
+
+            }
+
+
+            .success-detail {
+
+                align-items: flex-start;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           VERY SMALL MOBILE
+        ===================================================== */
+
+        @media (max-width: 400px) {
+
+            .checkout-hero h1 {
+
+                font-size: 34px;
+
+            }
+
+
+            .checkout-total {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 5px;
+
+            }
+
+
+            .checkout-total-amount {
+
+                font-size: 28px;
 
             }
 
@@ -964,12 +1590,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 align-items: flex-start;
 
+                flex-direction: column;
+
             }
 
 
-            .checkout-success {
+            .checkout-product-subtotal {
 
-                padding: 30px 20px;
+                align-self: flex-end;
 
             }
 
@@ -990,15 +1618,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     <!-- =====================================
-         ORDER SUCCESS
+         SUCCESS
     ====================================== -->
 
-    <div class="checkout-success">
+    <section class="checkout-success">
+
+
+        <img
+            src="assets/images/logo.png"
+            alt="NAVA Fade Studio Logo"
+            class="success-logo"
+        >
 
 
         <div class="checkout-success-icon">
             ✓
         </div>
+
+
+        <span class="success-label">
+            NAVA FADE STUDIO
+        </span>
 
 
         <h2>
@@ -1015,31 +1655,59 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
         <p>
-            Your order has been successfully placed
-            and is currently
+            Your order has been received and is currently
             <strong>Pending</strong>.
         </p>
 
 
+        <div class="success-order-details">
+
+
+            <div class="success-detail">
+
+                <span>
+                    Order Number
+                </span>
+
+                <span>
+                    #<?= (int) $order_id ?>
+                </span>
+
+            </div>
+
+
+            <div class="success-detail">
+
+                <span>
+                    Total Amount
+                </span>
+
+                <span>
+                    ₱<?= number_format($total, 2) ?>
+                </span>
+
+            </div>
+
+
+            <div class="success-detail">
+
+                <span>
+                    Order Status
+                </span>
+
+                <span>
+                    Pending
+                </span>
+
+            </div>
+
+
+        </div>
+
+
         <p>
-
-            Order Number:
-
-            <strong>
-                #<?= (int) $order_id ?>
-            </strong>
-
-        </p>
-
-
-        <p>
-
-            Total Amount:
-
-            <strong>
-                ₱<?= number_format($total, 2) ?>
-            </strong>
-
+            You can check your order status anytime from
+            <strong>My Orders</strong>.
         </p>
 
 
@@ -1051,48 +1719,57 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </a>
 
 
-    </div>
+    </section>
 
 
 <?php else: ?>
 
 
     <!-- =====================================
-         CHECKOUT HEADER
+         CHECKOUT HERO
     ====================================== -->
 
-    <div class="checkout-page-header">
+    <header class="checkout-hero">
 
-        <span>
+
+        <img
+            src="assets/images/logo.png"
+            alt="NAVA Fade Studio Logo"
+            class="checkout-logo"
+        >
+
+
+        <span class="checkout-eyebrow">
             NAVA FADE STUDIO
         </span>
 
 
         <h1>
-            Checkout
+            Secure <span>Checkout</span>
         </h1>
 
 
         <p>
-            Review your information and order before placing it.
+            Review your information and selected grooming
+            products before placing your order.
         </p>
 
-    </div>
 
+    </header>
+
+
+    <!-- =====================================
+         ERROR MESSAGE
+    ====================================== -->
 
     <?php if (!empty($errorMessage)): ?>
 
-
-        <!-- =================================
-             ERROR
-        ================================== -->
 
         <div class="checkout-error">
 
             <strong>
                 Order Failed
             </strong>
-
 
             <p>
                 <?= htmlspecialchars($errorMessage) ?>
@@ -1108,7 +1785,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
          CHECKOUT CONTENT
     ====================================== -->
 
-    <div class="checkout-container">
+    <section class="checkout-container">
 
 
         <!-- =================================
@@ -1123,50 +1800,107 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </h2>
 
 
-            <div class="customer-info-row">
-
-                <span class="customer-info-label">
-                    Full Name
-                </span>
+            <div class="customer-info">
 
 
-                <span class="customer-info-value">
+                <!-- FULL NAME -->
 
-                    <?= htmlspecialchars($customer["full_name"]) ?>
+                <div class="customer-info-row">
 
-                </span>
+
+                    <div class="customer-info-icon">
+                        👤
+                    </div>
+
+
+                    <div class="customer-info-content">
+
+                        <span class="customer-info-label">
+                            Full Name
+                        </span>
+
+                        <span class="customer-info-value">
+                            <?= htmlspecialchars($customer["full_name"]) ?>
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="customer-info-row">
+
+
+                    <div class="customer-info-icon">
+                        ✉
+                    </div>
+
+
+                    <div class="customer-info-content">
+
+                        <span class="customer-info-label">
+                            Email Address
+                        </span>
+
+                        <span class="customer-info-value">
+                            <?= htmlspecialchars($customer["email"]) ?>
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- CONTACT -->
+
+                <div class="customer-info-row">
+
+
+                    <div class="customer-info-icon">
+                        ☎
+                    </div>
+
+
+                    <div class="customer-info-content">
+
+                        <span class="customer-info-label">
+                            Contact Number
+                        </span>
+
+                        <span class="customer-info-value">
+                            <?= htmlspecialchars($customer["contact_number"]) ?>
+                        </span>
+
+                    </div>
+
+
+                </div>
+
 
             </div>
 
 
-            <div class="customer-info-row">
+            <!-- NOTICE -->
 
-                <span class="customer-info-label">
-                    Email
-                </span>
+            <div class="checkout-notice">
 
 
-                <span class="customer-info-value">
-
-                    <?= htmlspecialchars($customer["email"]) ?>
-
-                </span>
-
-            </div>
+                <div class="checkout-notice-icon">
+                    🔒
+                </div>
 
 
-            <div class="customer-info-row">
+                <p>
+                    Your order will be submitted securely and
+                    will initially have a
+                    <strong>Pending</strong>
+                    status until it is confirmed by NAVA Fade Studio.
+                </p>
 
-                <span class="customer-info-label">
-                    Contact Number
-                </span>
-
-
-                <span class="customer-info-value">
-
-                    <?= htmlspecialchars($customer["contact_number"]) ?>
-
-                </span>
 
             </div>
 
@@ -1186,50 +1920,58 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </h2>
 
 
-            <?php foreach ($orderItems as $item): ?>
+            <div class="checkout-products">
 
 
-                <div class="checkout-product">
+                <?php foreach ($orderItems as $item): ?>
 
 
-                    <div class="checkout-product-info">
+                    <div class="checkout-product">
 
 
-                        <h3>
-                            <?= htmlspecialchars($item["product_name"]) ?>
-                        </h3>
+                        <div class="checkout-product-info">
 
 
-                        <p>
-
-                            Quantity:
-                            <?= (int) $item["quantity"] ?>
-
-                        </p>
+                            <h3>
+                                <?= htmlspecialchars($item["product_name"]) ?>
+                            </h3>
 
 
-                        <p>
+                            <div class="checkout-product-details">
 
-                            ₱<?= number_format($item["price"], 2) ?>
-                            each
 
-                        </p>
+                                <span class="quantity">
+                                    Qty:
+                                    <?= (int) $item["quantity"] ?>
+                                </span>
+
+
+                                <span>
+                                    ₱<?= number_format($item["price"], 2) ?>
+                                    each
+                                </span>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="checkout-product-subtotal">
+
+                            ₱<?= number_format($item["subtotal"], 2) ?>
+
+                        </div>
 
 
                     </div>
 
 
-                    <div class="checkout-product-subtotal">
-
-                        ₱<?= number_format($item["subtotal"], 2) ?>
-
-                    </div>
+                <?php endforeach; ?>
 
 
-                </div>
-
-
-            <?php endforeach; ?>
+            </div>
 
 
             <!-- TOTAL -->
@@ -1237,15 +1979,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="checkout-total">
 
 
-                <span>
-                    Total
+                <span class="checkout-total-label">
+                    Total Amount
                 </span>
 
 
-                <span>
-
+                <span class="checkout-total-amount">
                     ₱<?= number_format($total, 2) ?>
-
                 </span>
 
 
@@ -1255,11 +1995,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
 
-    </div>
+    </section>
 
 
     <!-- =====================================
-         CHECKOUT ACTIONS
+         ACTIONS
     ====================================== -->
 
     <div class="checkout-actions">
@@ -1278,14 +2018,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             action="checkout.php"
         >
 
-
             <button
                 type="submit"
                 class="checkout-place-btn"
             >
                 Place Order
             </button>
-
 
         </form>
 

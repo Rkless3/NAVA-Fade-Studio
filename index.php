@@ -1,19 +1,245 @@
 <?php
 session_start();
 
+
+/* =========================================
+   CUSTOMER SESSION
+========================================= */
+
+$customer_logged_in = isset($_SESSION["customer_id"]);
+
+$customer_name = $_SESSION["customer_name"] ?? "";
+
+$customer_email = $_SESSION["customer_email"] ?? "";
+
+
 require_once "config/Database.php";
 require_once "classes/Service.php";
-require_once "classes/Review.php";
+
 
 $database = new Database();
+
 $db = $database->connect();
+
+$customer_id = $_SESSION["customer_id"];
+
+
+$success = "";
+
+$error = "";
 
 $serviceObject = new Service($db);
 $services = $serviceObject->getAll();
 
-$reviewObject = new Review($db);
-$featuredReview = $reviewObject->getFeatured();
+/* =========================================
+   UPDATE PROFILE
+========================================= */
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $full_name =
+        trim($_POST["full_name"] ?? "");
+
+    $email =
+        trim($_POST["email"] ?? "");
+
+    $contact_number =
+        trim($_POST["contact_number"] ?? "");
+
+
+    if (
+        empty($full_name) ||
+        empty($email) ||
+        empty($contact_number)
+    ) {
+
+        $error =
+            "Please fill in all fields.";
+
+    } elseif (
+        !filter_var(
+            $email,
+            FILTER_VALIDATE_EMAIL
+        )
+    ) {
+
+        $error =
+            "Please enter a valid email address.";
+
+    } else {
+
+        try {
+
+
+            /* -------------------------
+               CHECK EMAIL
+            ------------------------- */
+
+            $email_check =
+                $db->prepare("
+                    SELECT id
+                    FROM customers
+                    WHERE email = :email
+                    AND id != :id
+                    LIMIT 1
+                ");
+
+
+            $email_check->execute([
+
+                ":email" =>
+                    $email,
+
+                ":id" =>
+                    $customer_id
+
+            ]);
+
+
+            if ($email_check->fetch()) {
+
+                $error =
+                    "This email address is already being used.";
+
+            } else {
+
+
+                /* -------------------------
+                   UPDATE
+                ------------------------- */
+
+                $update_query =
+                    $db->prepare("
+                        UPDATE customers
+                        SET
+                            full_name = :full_name,
+                            email = :email,
+                            contact_number = :contact_number
+                        WHERE id = :id
+                    ");
+
+
+                $update_query->execute([
+
+                    ":full_name" =>
+                        $full_name,
+
+                    ":email" =>
+                        $email,
+
+                    ":contact_number" =>
+                        $contact_number,
+
+                    ":id" =>
+                        $customer_id
+
+                ]);
+
+
+                /* -------------------------
+                   UPDATE SESSION
+                ------------------------- */
+
+                $_SESSION["customer_name"] =
+                    $full_name;
+
+                $_SESSION["customer_email"] =
+                    $email;
+
+
+                $success =
+                    "Your profile has been updated successfully!";
+
+            }
+
+        } catch (PDOException $e) {
+
+            $error =
+                "Unable to update your profile. Please try again.";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+   GET CUSTOMER
+========================================= */
+
+$customer_query =
+    $db->prepare("
+        SELECT
+            full_name,
+            email,
+            contact_number,
+            created_at
+        FROM customers
+        WHERE id = :id
+        LIMIT 1
+    ");
+
+
+$customer_query->execute([
+
+    ":id" =>
+        $customer_id
+
+]);
+
+
+$customer =
+    $customer_query->fetch(
+        PDO::FETCH_ASSOC
+    );
+
+
+/* =========================================
+   SAFETY CHECK
+========================================= */
+
+if (!$customer) {
+
+    session_destroy();
+
+    header("Location: login.php");
+
+    exit();
+
+}
+
+
+/* =========================================
+   INITIAL
+========================================= */
+
+$name_parts =
+    preg_split(
+        '/\s+/',
+        trim($customer["full_name"])
+    );
+
+
+$initials = "";
+
+
+foreach (
+    array_slice($name_parts, 0, 2)
+    as $part
+) {
+
+    $initials .=
+        strtoupper(
+            substr($part, 0, 1)
+        );
+
+}
+
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,50 +315,129 @@ $featuredReview = $reviewObject->getFeatured();
 
             <?php if (isset($_SESSION["customer_id"])): ?>
 
-                <div class="customer-menu">
+                <!-- CUSTOMER MENU -->
 
-                    <button
-                        class="customer-menu-btn"
-                        type="button"
-                        onclick="toggleCustomerMenu()"
+            <div class="customer-menu">
+
+                <button
+                    class="customer-menu-btn"
+                    type="button"
+                    onclick="toggleCustomerMenu()"
+                >
+
+                    <span class="profile-avatar">
+
+                            <?= htmlspecialchars(
+                                $initials
+                            ) ?>
+
+                        </span>
+
+
+                    <span class="dropdown-arrow">
+                        ▼
+                    </span>
+
+                </button>
+
+
+                <div
+                    class="customer-dropdown"
+                    id="customerDropdown"
+                >
+
+
+                    <a
+                        href="profile.php"
+                        class="customer-profile-card"
                     >
 
-                        👤 <?= htmlspecialchars($_SESSION["customer_name"]) ?>
+                        <span class="profile-avatar">
 
-                        <span class="dropdown-arrow">▼</span>
+                            <?= htmlspecialchars(
+                                $initials
+                            ) ?>
 
-                    </button>
+                        </span>
 
 
-                    <div
-                        class="customer-dropdown"
-                        id="customerDropdown"
-                    >
+                        <span class="profile-details">
 
-                        <a href="my-orders.php">
-                            🛍️ My Orders
-                        </a>
+                            <strong>
+                                <?= htmlspecialchars(
+                                    $customer["full_name"]
+                                ) ?>
+                            </strong>
 
-                        <a href="appointments.php">
-                            📅 My Appointments
-                        </a>
-                        
-                        <a href="review.php">
-                            ⭐ Write a Review
-                        </a>
+
+                            <small>
+                                <?= htmlspecialchars(
+                                    $customer["email"]
+                                ) ?>
+                            </small>
+
+                        </span>
+
+                    </a>
+
 
                     <div class="dropdown-divider"></div>
 
-                        <a
-                            href="logout.php"
-                            class="logout-link"
-                        >
-                            🚪 Logout
-                        </a>
 
-                    </div>
+                    <a
+                        href="my-orders.php"
+                        class="customer-dropdown-link"
+                    >
+                        <span class="dropdown-icon">
+                            🛍️
+                        </span>
+
+                        My Orders
+                    </a>
+
+
+                    <a
+                        href="appointments.php"
+                        class="customer-dropdown-link"
+                    >
+                        <span class="dropdown-icon">
+                            📅
+                        </span>
+
+                        My Appointments
+                    </a>
+
+
+                    <a
+                        href="review.php"
+                        class="customer-dropdown-link"
+                    >
+                        <span class="dropdown-icon">
+                            ⭐
+                        </span>
+
+                        Write a Review
+                    </a>
+
+
+                    <div class="dropdown-divider"></div>
+
+
+                    <a
+                        href="logout.php"
+                        class="customer-dropdown-link logout-link"
+                    >
+                        <span class="dropdown-icon">
+                            🚪
+                        </span>
+
+                        Logout
+                    </a>
+
 
                 </div>
+
+            </div>
 
             <?php else: ?>
 
@@ -631,9 +936,9 @@ $featuredReview = $reviewObject->getFeatured();
                         Add to Cart
                     </a>
 
-                    <button class="view-btn">
+                    <a href="shop.php" class="view-btn">
                         View Details
-                    </button>
+                    </a>
 
                 </div>
 
@@ -674,9 +979,9 @@ $featuredReview = $reviewObject->getFeatured();
                         Add to Cart
                     </a>
 
-                    <button class="view-btn">
+                    <a href="shop.php" class="view-btn">
                         View Details
-                    </button>
+                    </a>
 
                 </div>
 
@@ -716,9 +1021,9 @@ $featuredReview = $reviewObject->getFeatured();
                         Add to Cart
                     </a>
 
-                    <button class="view-btn">
+                    <a href="shop.php" class="view-btn">
                         View Details
-                    </button>
+                    </a>
 
                 </div>
 

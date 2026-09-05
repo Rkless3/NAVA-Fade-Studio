@@ -2,7 +2,6 @@
 
 session_start();
 
-
 /* =========================================
    CHECK IF CUSTOMER IS LOGGED IN
 ========================================= */
@@ -84,8 +83,67 @@ if (!empty($orders)) {
     }
 }
 
-?>
 
+/* =========================================
+   HELPER FUNCTIONS
+========================================= */
+
+function getStatusClass(string $status): string
+{
+    return strtolower(str_replace(" ", "-", $status));
+}
+
+
+function getStatusIcon(string $status): string
+{
+    switch ($status) {
+
+        case "Pending":
+            return "🕐";
+
+        case "Confirmed":
+            return "✓";
+
+        case "Processing":
+            return "⚙";
+
+        case "Completed":
+            return "✓";
+
+        case "Cancelled":
+            return "×";
+
+        default:
+            return "•";
+    }
+}
+
+
+function getStatusDescription(string $status): string
+{
+    switch ($status) {
+
+        case "Pending":
+            return "Your order has been received and is waiting for confirmation.";
+
+        case "Confirmed":
+            return "Your order has been confirmed by NAVA Fade Studio.";
+
+        case "Processing":
+            return "Your order is currently being prepared.";
+
+        case "Completed":
+            return "Your order has been completed successfully.";
+
+        case "Cancelled":
+            return "This order has been cancelled.";
+
+        default:
+            return "Your order status has been updated.";
+    }
+}
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -106,57 +164,114 @@ if (!empty($orders)) {
         href="assets/css/style.css"
     >
 
-
     <style>
 
         /* =========================================
            MY ORDERS PAGE
         ========================================= */
 
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            background: #0e1423;
+        }
+
+
         .orders-page {
+
             min-height: 100vh;
 
-            padding: 140px 20px 80px;
+            padding: 125px 20px 80px;
 
             background:
                 linear-gradient(
-                    rgba(14, 20, 35, 0.93),
-                    rgba(14, 20, 35, 0.93)
+                    rgba(14, 20, 35, 0.94)
                 ),
-                url("assets/images/pattern2.png");
+                url("assets/images/pattern3.png");
 
             background-size: 300px;
+
+            background-attachment: fixed;
         }
 
 
         .orders-container {
-            max-width: 1100px;
+
+            width: 100%;
+
+            max-width: 1120px;
+
             margin: 0 auto;
         }
 
 
         /* =========================================
-           HEADER
+           PAGE HEADER
         ========================================= */
 
         .orders-header {
+
             text-align: center;
-            margin-bottom: 45px;
+
+            margin-bottom: 50px;
         }
+
+
+        .orders-eyebrow {
+
+            display: inline-block;
+
+            color: #c8942f;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 4px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 12px;
+        }
+
 
         .orders-header h1 {
+
+            margin: 0;
+
             color: #ffffff;
-            font-size: 42px;
-            margin-bottom: 8px;
+
+            font-size: clamp(38px, 5vw, 58px);
+
+            line-height: 1.1;
+
+            font-weight: 800;
+
+            letter-spacing: -1px;
         }
 
+
         .orders-header h1 span {
+
             color: #c8942f;
         }
 
+
         .orders-header p {
-            color: #aeb5c3;
+
+            margin: 15px auto 0;
+
+            max-width: 600px;
+
+            color: #aeb7c8;
+
             font-size: 16px;
+
+            line-height: 1.6;
         }
 
 
@@ -166,18 +281,64 @@ if (!empty($orders)) {
 
         .order-card {
 
-            background: rgba(14, 20, 35, 0.96);
+            position: relative;
 
-            border: 1px solid #b8862c;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(18, 27, 45, 0.98),
+                    rgba(10, 16, 29, 0.98)
+                );
 
-            border-radius: 15px;
+            border: 1px solid rgba(200, 148, 47, 0.65);
 
-            padding: 25px;
+            border-radius: 18px;
 
-            margin-bottom: 25px;
+            padding: 30px;
+
+            margin-bottom: 28px;
 
             box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.25);
+                0 18px 45px rgba(0, 0, 0, 0.30);
+
+            overflow: hidden;
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+
+        .order-card::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 3px;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #c8942f,
+                transparent
+            );
+        }
+
+
+        .order-card:hover {
+
+            transform: translateY(-3px);
+
+            border-color: #c8942f;
+
+            box-shadow:
+                0 22px 55px rgba(0, 0, 0, 0.40);
         }
 
 
@@ -191,13 +352,11 @@ if (!empty($orders)) {
 
             justify-content: space-between;
 
-            align-items: center;
+            align-items: flex-start;
 
-            gap: 20px;
+            gap: 25px;
 
-            margin-bottom: 20px;
-
-            padding-bottom: 18px;
+            padding-bottom: 24px;
 
             border-bottom:
                 1px solid
@@ -205,87 +364,400 @@ if (!empty($orders)) {
         }
 
 
+        .order-heading {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+
+        .order-label {
+
+            color: #c8942f;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+        }
+
+
         .order-number {
 
             color: #ffffff;
 
-            font-size: 19px;
+            font-size: 22px;
 
-            font-weight: bold;
+            font-weight: 800;
         }
 
 
         .order-date {
 
-            color: #9fa7b8;
+            color: #9fa9bb;
 
             font-size: 14px;
+        }
 
-            margin-top: 5px;
+
+        .order-status-wrapper {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: flex-end;
+
+            gap: 8px;
+        }
+
+
+        .order-status {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 9px 16px;
+
+            border-radius: 30px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            border: 1px solid transparent;
+
+            white-space: nowrap;
+        }
+
+
+        .status-icon {
+
+            width: 19px;
+
+            height: 19px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            font-size: 11px;
+
+            font-weight: 900;
         }
 
 
         /* =========================================
-           STATUS
+           STATUS COLORS
         ========================================= */
-
-        .order-status {
-
-            display: inline-block;
-
-            padding: 8px 15px;
-
-            border-radius: 20px;
-
-            font-size: 13px;
-
-            font-weight: bold;
-        }
-
 
         .status-pending {
 
-            background: rgba(255, 193, 7, 0.15);
-
             color: #ffc107;
+
+            background: rgba(255, 193, 7, 0.10);
+
+            border-color: rgba(255, 193, 7, 0.45);
+        }
+
+
+        .status-pending .status-icon {
+
+            background: rgba(255, 193, 7, 0.20);
         }
 
 
         .status-confirmed {
 
-            background: rgba(0, 188, 212, 0.15);
+            color: #36c7d8;
 
-            color: #00bcd4;
+            background: rgba(54, 199, 216, 0.10);
+
+            border-color: rgba(54, 199, 216, 0.45);
+        }
+
+
+        .status-confirmed .status-icon {
+
+            background: rgba(54, 199, 216, 0.20);
         }
 
 
         .status-processing {
 
-            background: rgba(33, 150, 243, 0.15);
+            color: #55a9ff;
 
-            color: #2196f3;
+            background: rgba(85, 169, 255, 0.10);
+
+            border-color: rgba(85, 169, 255, 0.45);
+        }
+
+
+        .status-processing .status-icon {
+
+            background: rgba(85, 169, 255, 0.20);
         }
 
 
         .status-completed {
 
-            background: rgba(76, 175, 80, 0.15);
+            color: #62d47b;
 
-            color: #4caf50;
+            background: rgba(98, 212, 123, 0.10);
+
+            border-color: rgba(98, 212, 123, 0.45);
+        }
+
+
+        .status-completed .status-icon {
+
+            background: rgba(98, 212, 123, 0.20);
         }
 
 
         .status-cancelled {
 
-            background: rgba(244, 67, 54, 0.15);
+            color: #ff6565;
 
-            color: #f44336;
+            background: rgba(255, 101, 101, 0.10);
+
+            border-color: rgba(255, 101, 101, 0.45);
+        }
+
+
+        .status-cancelled .status-icon {
+
+            background: rgba(255, 101, 101, 0.20);
+        }
+
+
+        .status-description {
+
+            color: #7f8ba0;
+
+            font-size: 12px;
+
+            text-align: right;
+
+            max-width: 280px;
+
+            line-height: 1.4;
         }
 
 
         /* =========================================
-           PRODUCT ITEM
+           ORDER PROGRESS
         ========================================= */
+
+        .order-progress {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            margin: 28px 0 12px;
+
+            position: relative;
+        }
+
+
+        .progress-line {
+
+            position: absolute;
+
+            top: 15px;
+
+            left: 10%;
+
+            right: 10%;
+
+            height: 2px;
+
+            background: rgba(255, 255, 255, 0.10);
+
+            z-index: 0;
+        }
+
+
+        .progress-line-active {
+
+            position: absolute;
+
+            top: 15px;
+
+            left: 10%;
+
+            height: 2px;
+
+            background: #c8942f;
+
+            z-index: 1;
+
+            transition: width 0.4s ease;
+        }
+
+
+        .progress-step {
+
+            position: relative;
+
+            z-index: 2;
+
+            width: 25%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            gap: 8px;
+
+            color: #707b8f;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            text-align: center;
+        }
+
+
+        .progress-circle {
+
+            width: 30px;
+
+            height: 30px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #111a2c;
+
+            border: 2px solid #394255;
+
+            color: #707b8f;
+
+            font-size: 12px;
+
+            font-weight: 800;
+        }
+
+
+        .progress-step.active {
+
+            color: #dca63b;
+        }
+
+
+        .progress-step.active .progress-circle {
+
+            background: #c8942f;
+
+            border-color: #c8942f;
+
+            color: #0e1423;
+
+            box-shadow:
+                0 0 0 5px rgba(200, 148, 47, 0.10);
+        }
+
+
+        .progress-step.completed {
+
+            color: #c8942f;
+        }
+
+
+        .progress-step.completed .progress-circle {
+
+            background: #c8942f;
+
+            border-color: #c8942f;
+
+            color: #0e1423;
+        }
+
+
+        .progress-cancelled {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin: 25px 0 5px;
+
+            padding: 14px;
+
+            border-radius: 10px;
+
+            background: rgba(255, 101, 101, 0.07);
+
+            border: 1px solid rgba(255, 101, 101, 0.20);
+
+            color: #ff7777;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           PRODUCTS
+        ========================================= */
+
+        .products-heading {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-top: 25px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .products-heading span:first-child {
+
+            color: #ffffff;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+
+        .items-count {
+
+            color: #8d98aa;
+
+            font-size: 12px;
+        }
+
 
         .order-item {
 
@@ -293,13 +765,15 @@ if (!empty($orders)) {
 
             align-items: center;
 
-            gap: 18px;
+            gap: 20px;
 
-            padding: 15px 0;
+            padding: 20px 0;
 
             border-bottom:
                 1px solid
-                rgba(255, 255, 255, 0.06);
+                rgba(255, 255, 255, 0.07);
+
+            transition: padding 0.2s ease;
         }
 
 
@@ -309,19 +783,39 @@ if (!empty($orders)) {
         }
 
 
+        .order-item:hover {
+
+            padding-left: 5px;
+
+            padding-right: 5px;
+        }
+
+
+        /* =========================================
+           PRODUCT IMAGE
+        ========================================= */
+
         .order-item-image {
 
-            width: 75px;
+            width: 86px;
 
-            height: 75px;
+            height: 86px;
 
-            border-radius: 10px;
+            flex-shrink: 0;
+
+            border-radius: 13px;
 
             overflow: hidden;
 
-            background: #151d30;
+            background: #ffffff;
 
-            flex-shrink: 0;
+            border: 1px solid rgba(200, 148, 47, 0.35);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
         }
 
 
@@ -332,12 +826,28 @@ if (!empty($orders)) {
             height: 100%;
 
             object-fit: cover;
+
+            display: block;
+
+            transition: transform 0.3s ease;
         }
 
+
+        .order-item:hover .order-item-image img {
+
+            transform: scale(1.05);
+        }
+
+
+        /* =========================================
+           PRODUCT INFORMATION
+        ========================================= */
 
         .order-item-info {
 
             flex: 1;
+
+            min-width: 0;
         }
 
 
@@ -345,29 +855,39 @@ if (!empty($orders)) {
 
             color: #ffffff;
 
-            font-size: 16px;
+            font-size: 17px;
 
-            font-weight: bold;
+            font-weight: 700;
 
-            margin-bottom: 5px;
+            margin-bottom: 7px;
         }
 
 
         .order-item-details {
 
-            color: #9fa7b8;
+            color: #929db0;
 
-            font-size: 14px;
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+
+        .order-item-details strong {
+
+            color: #c8942f;
         }
 
 
         .order-item-subtotal {
 
-            color: #d19a2a;
+            color: #dca63b;
 
-            font-weight: bold;
+            font-size: 17px;
 
-            font-size: 16px;
+            font-weight: 800;
+
+            white-space: nowrap;
         }
 
 
@@ -379,37 +899,63 @@ if (!empty($orders)) {
 
             display: flex;
 
-            justify-content: flex-end;
+            justify-content: space-between;
 
             align-items: center;
 
-            margin-top: 20px;
+            gap: 20px;
 
-            padding-top: 18px;
+            margin-top: 10px;
+
+            padding-top: 24px;
 
             border-top:
                 1px solid
-                rgba(255, 255, 255, 0.08);
+                rgba(255, 255, 255, 0.10);
+        }
+
+
+        .order-summary-label {
+
+            color: #8994a7;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.5px;
+
+            font-weight: 700;
         }
 
 
         .order-total {
 
-            color: #ffffff;
+            display: flex;
 
-            font-size: 17px;
+            align-items: center;
 
-            font-weight: bold;
+            gap: 12px;
         }
 
 
-        .order-total span {
+        .order-total-label {
 
-            color: #d19a2a;
+            color: #ffffff;
 
-            font-size: 21px;
+            font-size: 15px;
 
-            margin-left: 8px;
+            font-weight: 700;
+        }
+
+
+        .order-total-price {
+
+            color: #e0a936;
+
+            font-size: 25px;
+
+            font-weight: 900;
         }
 
 
@@ -421,43 +967,83 @@ if (!empty($orders)) {
 
             text-align: center;
 
-            padding: 70px 20px;
+            padding: 75px 25px;
 
-            background: rgba(14, 20, 35, 0.96);
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(18, 27, 45, 0.98),
+                    rgba(10, 16, 29, 0.98)
+                );
 
-            border: 1px solid #b8862c;
+            border:
+                1px solid
+                rgba(200, 148, 47, 0.60);
 
-            border-radius: 15px;
+            border-radius: 18px;
+
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.30);
         }
 
 
         .empty-orders-icon {
 
-            font-size: 50px;
+            width: 75px;
 
-            margin-bottom: 15px;
+            height: 75px;
+
+            margin: 0 auto 20px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: rgba(200, 148, 47, 0.10);
+
+            border: 1px solid rgba(200, 148, 47, 0.30);
+
+            font-size: 32px;
         }
 
 
         .empty-orders h2 {
 
+            margin: 0 0 10px;
+
             color: #ffffff;
 
-            margin-bottom: 10px;
+            font-size: 25px;
         }
 
 
         .empty-orders p {
 
-            color: #9fa7b8;
+            max-width: 500px;
 
-            margin-bottom: 25px;
+            margin: 0 auto 25px;
+
+            color: #8f9bad;
+
+            font-size: 14px;
+
+            line-height: 1.6;
         }
 
 
         .shop-btn {
 
-            display: inline-block;
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
 
             background: #c8942f;
 
@@ -469,15 +1055,21 @@ if (!empty($orders)) {
 
             border-radius: 8px;
 
-            font-weight: bold;
+            font-weight: 800;
 
-            transition: 0.3s;
+            font-size: 13px;
+
+            transition:
+                background 0.25s ease,
+                transform 0.25s ease;
         }
 
 
         .shop-btn:hover {
 
             background: #e0aa3b;
+
+            transform: translateY(-2px);
         }
 
 
@@ -495,17 +1087,42 @@ if (!empty($orders)) {
 
         .orders-back a {
 
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 11px 18px;
+
+            border: 1px solid rgba(200, 148, 47, 0.45);
+
+            border-radius: 8px;
+
             color: #c8942f;
+
+            background: rgba(14, 20, 35, 0.50);
 
             text-decoration: none;
 
-            font-weight: bold;
+            font-size: 13px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.25s ease,
+                border-color 0.25s ease,
+                transform 0.25s ease;
         }
 
 
         .orders-back a:hover {
 
-            text-decoration: underline;
+            background: rgba(200, 148, 47, 0.10);
+
+            border-color: #c8942f;
+
+            transform: translateY(-2px);
         }
 
 
@@ -513,53 +1130,286 @@ if (!empty($orders)) {
            RESPONSIVE
         ========================================= */
 
+        @media (max-width: 800px) {
+
+            .orders-page {
+
+                padding: 110px 15px 60px;
+
+                background-size: 240px;
+            }
+
+
+            .order-card {
+
+                padding: 22px;
+
+                border-radius: 15px;
+            }
+
+
+            .order-top {
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+
+            .order-status-wrapper {
+
+                align-items: flex-start;
+            }
+
+
+            .status-description {
+
+                text-align: left;
+
+                max-width: 100%;
+            }
+
+
+            .order-progress {
+
+                margin-top: 25px;
+            }
+
+
+            .progress-step {
+
+                font-size: 10px;
+            }
+
+
+            .order-item {
+
+                gap: 14px;
+            }
+
+
+            .order-item-image {
+
+                width: 72px;
+
+                height: 72px;
+            }
+
+
+            .order-item-name {
+
+                font-size: 15px;
+            }
+
+
+            .order-item-subtotal {
+
+                font-size: 15px;
+            }
+        }
+
+
         @media (max-width: 600px) {
 
             .orders-page {
 
-                padding: 120px 15px 60px;
+                padding: 100px 12px 50px;
+            }
+
+
+            .orders-header {
+
+                margin-bottom: 35px;
             }
 
 
             .orders-header h1 {
 
-                font-size: 32px;
+                font-size: 38px;
+            }
+
+
+            .orders-header p {
+
+                font-size: 14px;
             }
 
 
             .order-card {
 
                 padding: 18px;
+
+                margin-bottom: 20px;
             }
 
 
-            .order-top {
+            .order-number {
 
-                align-items: flex-start;
+                font-size: 19px;
+            }
 
-                flex-direction: column;
+
+            .order-date {
+
+                font-size: 12px;
+            }
+
+
+            .order-status {
+
+                font-size: 12px;
+
+                padding: 8px 13px;
+            }
+
+
+            .order-progress {
+
+                margin-left: -5px;
+
+                margin-right: -5px;
+            }
+
+
+            .progress-circle {
+
+                width: 27px;
+
+                height: 27px;
+
+                font-size: 10px;
+            }
+
+
+            .progress-line,
+            .progress-line-active {
+
+                top: 13px;
+            }
+
+
+            .progress-step {
+
+                font-size: 9px;
             }
 
 
             .order-item {
 
-                align-items: flex-start;
+                display: grid;
+
+                grid-template-columns: 65px 1fr;
+
+                gap: 12px;
+
+                padding: 17px 0;
             }
 
 
             .order-item-image {
 
-                width: 60px;
+                width: 65px;
 
-                height: 60px;
+                height: 65px;
+
+                grid-row: span 2;
+            }
+
+
+            .order-item-info {
+
+                width: 100%;
+            }
+
+
+            .order-item-name {
+
+                font-size: 14px;
+
+                margin-bottom: 4px;
+            }
+
+
+            .order-item-details {
+
+                font-size: 12px;
             }
 
 
             .order-item-subtotal {
 
-                font-size: 14px;
+                grid-column: 2;
+
+                font-size: 15px;
+
+                margin-top: -5px;
             }
 
+
+            .order-bottom {
+
+                align-items: flex-end;
+
+                flex-direction: column;
+
+                gap: 8px;
+            }
+
+
+            .order-total {
+
+                width: 100%;
+
+                justify-content: space-between;
+            }
+
+
+            .order-total-price {
+
+                font-size: 23px;
+            }
+
+
+            .empty-orders {
+
+                padding: 55px 18px;
+            }
+        }
+
+
+        @media (max-width: 400px) {
+
+            .orders-header h1 {
+
+                font-size: 34px;
+            }
+
+
+            .order-card {
+
+                padding: 15px;
+            }
+
+
+            .progress-step {
+
+                font-size: 8px;
+            }
+
+
+            .progress-circle {
+
+                width: 24px;
+
+                height: 24px;
+            }
+
+
+            .progress-line,
+            .progress-line-active {
+
+                top: 12px;
+            }
         }
 
     </style>
@@ -576,17 +1426,22 @@ if (!empty($orders)) {
 
 
         <!-- =========================================
-             HEADER
+             PAGE HEADER
         ========================================= -->
 
         <div class="orders-header">
+
+            <div class="orders-eyebrow">
+                NAVA FADE STUDIO
+            </div>
 
             <h1>
                 My <span>Orders</span>
             </h1>
 
             <p>
-                View your purchased products and order status.
+                Track your grooming products and stay updated
+                with the status of every order you've placed.
             </p>
 
         </div>
@@ -610,15 +1465,15 @@ if (!empty($orders)) {
                 </h2>
 
                 <p>
-                    You haven't purchased any products from
-                    NAVA Fade Studio yet.
+                    You haven't purchased any grooming products
+                    from NAVA Fade Studio yet.
                 </p>
 
                 <a
                     href="shop.php"
                     class="shop-btn"
                 >
-                    SHOP NOW
+                    🛒 SHOP PRODUCTS
                 </a>
 
             </div>
@@ -633,24 +1488,47 @@ if (!empty($orders)) {
 
             <?php foreach ($orders as $order): ?>
 
+                <?php
+
+                $status = $order["status"];
+
+                $statusClass = getStatusClass($status);
+
+                $statusIcon = getStatusIcon($status);
+
+                $items = $order_items[$order["id"]] ?? [];
+
+                $itemCount = 0;
+
+                foreach ($items as $item) {
+                    $itemCount += (int) $item["quantity"];
+                }
+
+                ?>
+
+
                 <div class="order-card">
 
 
-                    <!-- ORDER HEADER -->
+                    <!-- =================================
+                         ORDER HEADER
+                    ================================== -->
 
                     <div class="order-top">
 
-                        <div>
+                        <div class="order-heading">
+
+                            <div class="order-label">
+                                Order Details
+                            </div>
 
                             <div class="order-number">
-
-                                Order
-                                #<?= (int) $order["id"] ?>
-
+                                Order #<?= (int) $order["id"] ?>
                             </div>
 
                             <div class="order-date">
 
+                                Placed on
                                 <?= date(
                                     "F j, Y • h:i A",
                                     strtotime($order["created_at"])
@@ -661,31 +1539,209 @@ if (!empty($orders)) {
                         </div>
 
 
+                        <div class="order-status-wrapper">
+
+                            <span
+                                class="order-status status-<?= htmlspecialchars($statusClass) ?>"
+                            >
+
+                                <span class="status-icon">
+                                    <?= htmlspecialchars($statusIcon) ?>
+                                </span>
+
+                                <?= htmlspecialchars($status) ?>
+
+                            </span>
+
+
+                            <div class="status-description">
+
+                                <?= htmlspecialchars(
+                                    getStatusDescription($status)
+                                ) ?>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================
+                         ORDER PROGRESS
+                    ================================== -->
+
+                    <?php if ($status !== "Cancelled"): ?>
+
                         <?php
 
-                        $statusClass =
-                            strtolower($order["status"]);
+                        $progressMap = [
+                            "Pending" => 1,
+                            "Confirmed" => 2,
+                            "Processing" => 3,
+                            "Completed" => 4
+                        ];
+
+                        $currentStep =
+                            $progressMap[$status] ?? 1;
+
+                        $activeWidth =
+                            (($currentStep - 1) / 3) * 80;
 
                         ?>
 
+                        <div class="order-progress">
 
-                        <span
-                            class="order-status status-<?= htmlspecialchars($statusClass) ?>"
-                        >
+                            <div class="progress-line"></div>
 
-                            <?= htmlspecialchars($order["status"]) ?>
+                            <div
+                                class="progress-line-active"
+                                style="width: <?= $activeWidth ?>%;"
+                            ></div>
+
+
+                            <!-- STEP 1 -->
+
+                            <div
+                                class="
+                                    progress-step
+                                    <?= $currentStep >= 1
+                                        ? "completed"
+                                        : "" ?>
+                                    <?= $currentStep === 1
+                                        ? "active"
+                                        : "" ?>
+                                "
+                            >
+
+                                <div class="progress-circle">
+                                    1
+                                </div>
+
+                                <span>
+                                    Pending
+                                </span>
+
+                            </div>
+
+
+                            <!-- STEP 2 -->
+
+                            <div
+                                class="
+                                    progress-step
+                                    <?= $currentStep >= 2
+                                        ? "completed"
+                                        : "" ?>
+                                    <?= $currentStep === 2
+                                        ? "active"
+                                        : "" ?>
+                                "
+                            >
+
+                                <div class="progress-circle">
+                                    2
+                                </div>
+
+                                <span>
+                                    Confirmed
+                                </span>
+
+                            </div>
+
+
+                            <!-- STEP 3 -->
+
+                            <div
+                                class="
+                                    progress-step
+                                    <?= $currentStep >= 3
+                                        ? "completed"
+                                        : "" ?>
+                                    <?= $currentStep === 3
+                                        ? "active"
+                                        : "" ?>
+                                "
+                            >
+
+                                <div class="progress-circle">
+                                    3
+                                </div>
+
+                                <span>
+                                    Processing
+                                </span>
+
+                            </div>
+
+
+                            <!-- STEP 4 -->
+
+                            <div
+                                class="
+                                    progress-step
+                                    <?= $currentStep >= 4
+                                        ? "completed"
+                                        : "" ?>
+                                    <?= $currentStep === 4
+                                        ? "active"
+                                        : "" ?>
+                                "
+                            >
+
+                                <div class="progress-circle">
+                                    4
+                                </div>
+
+                                <span>
+                                    Completed
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    <?php else: ?>
+
+                        <div class="progress-cancelled">
+
+                            ✕ &nbsp;
+
+                            This order has been cancelled.
+
+                        </div>
+
+                    <?php endif; ?>
+
+
+                    <!-- =================================
+                         PRODUCTS HEADER
+                    ================================== -->
+
+                    <div class="products-heading">
+
+                        <span>
+                            Products
+                        </span>
+
+                        <span class="items-count">
+
+                            <?= $itemCount ?>
+
+                            <?= $itemCount === 1
+                                ? "item"
+                                : "items" ?>
 
                         </span>
 
                     </div>
 
 
-                    <!-- PRODUCTS -->
+                    <!-- =================================
+                         PRODUCTS
+                    ================================== -->
 
-                    <?php foreach (
-                        $order_items[$order["id"]] ?? []
-                        as $item
-                    ): ?>
+                    <?php foreach ($items as $item): ?>
 
                         <div class="order-item">
 
@@ -700,6 +1756,12 @@ if (!empty($orders)) {
                                         src="assets/images/<?= htmlspecialchars($item["image"]) ?>"
                                         alt="<?= htmlspecialchars($item["product_name"]) ?>"
                                     >
+
+                                <?php else: ?>
+
+                                    <span>
+                                        🛍️
+                                    </span>
 
                                 <?php endif; ?>
 
@@ -726,9 +1788,15 @@ if (!empty($orders)) {
                                         2
                                     ) ?>
 
-                                    ×
+                                    each
 
-                                    <?= (int) $item["quantity"] ?>
+                                    &nbsp; • &nbsp;
+
+                                    Quantity:
+
+                                    <strong>
+                                        <?= (int) $item["quantity"] ?>
+                                    </strong>
 
                                 </div>
 
@@ -752,15 +1820,28 @@ if (!empty($orders)) {
                     <?php endforeach; ?>
 
 
-                    <!-- ORDER TOTAL -->
+                    <!-- =================================
+                         ORDER TOTAL
+                    ================================== -->
 
                     <div class="order-bottom">
 
+                        <div>
+
+                            <div class="order-summary-label">
+                                Order Summary
+                            </div>
+
+                        </div>
+
+
                         <div class="order-total">
 
-                            Total:
+                            <span class="order-total-label">
+                                Total
+                            </span>
 
-                            <span>
+                            <span class="order-total-price">
 
                                 ₱<?= number_format(
                                     (float) $order["total_amount"],
@@ -776,13 +1857,16 @@ if (!empty($orders)) {
 
                 </div>
 
+
             <?php endforeach; ?>
 
 
         <?php endif; ?>
 
 
-        <!-- BACK -->
+        <!-- =========================================
+             BACK TO HOME
+        ========================================= -->
 
         <div class="orders-back">
 
